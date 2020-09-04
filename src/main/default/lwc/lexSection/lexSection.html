@@ -1,0 +1,21 @@
+<template>
+  <div class="slds-section slds-is-open slds-var-p-bottom_medium">
+    <h3 class="slds-section__title">
+      <button
+        class="slds-button slds-section__title-action"
+        title={title}
+        onclick={handleTitleClicked}
+      >
+        <lightning-icon
+          icon-name={iconName}
+          size="x-small"
+          class="slds-var-m-right_x-small"
+        ></lightning-icon>
+        <span>{title}</span>
+      </button>
+    </h3>
+    <div class="slds-section__content slds-var-p-horizontal_small">
+      <slot></slot>
+    </div>
+  </div>
+</template>
