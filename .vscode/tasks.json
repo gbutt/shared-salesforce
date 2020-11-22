@@ -17,6 +17,11 @@
             "label": "sfdx-jest-test",
             "type": "shell",
             "command": "npm run test:unit"
+        },
+        {
+            "label": "sfdx-apex-test",
+            "type": "shell",
+            "command": "sfdx force:apex:test:run -w 10"
         }
     ]
 }
