@@ -1,0 +1,90 @@
+.sai-user-menu {
+    font-size: 0.875rem;
+}
+.sai-user-menu_menu-trigger {
+    display: inline-flex;
+    align-items: center;
+    border: none;
+    background: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+.sai-user-menu_photo-img {
+    width: 30px;
+    height: auto;
+    border-radius: var(--lwc-borderRadiusCircle, 50%);
+}
+@media (max-width: 767px) {
+    .sai-user-menu_photo-img {
+        width: 20px;
+    }
+}
+
+.sai-user-menu_user-name {
+    margin-left: 8px;
+    color: white;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    max-width: 120px;
+}
+
+@media (max-width: 767px) {
+    .sai-user-menu_user-name {
+        display: none;
+    }
+}
+
+.sai-user-menu_menu-trigger-target {
+    position: relative;
+    outline: none;
+}
+
+.sai-user-menu_menu-items {
+    position: absolute;
+    background: white;
+    top: 12px;
+    right: 0px;
+    border: 1px solid #dddbda;
+    border-radius: 5px;
+    z-index: 500;
+    box-shadow: 0 2px 7px 0 rgba(0, 0, 0, 0.16);
+}
+
+.sai-user-menu_menu-items.slds-nubbin_top-right::before {
+    background-color: unset;
+    border: 1px solid #dddbda;
+    z-index: -1;
+}
+@media (max-width: 767px) {
+    .sai-user-menu_menu-items {
+        margin-right: -14px;
+        margin-top: 3px;
+    }
+}
+
+.sai-user-menu_menu-item {
+    border-bottom: 1px solid #f0f0f0;
+}
+.sai-user-menu_menu-item > a {
+    display: block;
+    padding: 0.75rem 1.5rem;
+
+    color: rgba(0, 0, 0, 0.8);
+}
+.sai-user-menu_menu-item:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.sai-user-menu_menu-item:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.sai-user-menu_menu-item:hover,
+.sai-user-menu_menu-item > a:focus {
+    background: rgb(240, 240, 240);
+}
+
+a,
+a:hover {
+    color: rgba(0, 0, 0, 0.8);
+    text-decoration: none;
+}

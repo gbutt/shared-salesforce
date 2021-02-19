@@ -1,0 +1,17 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" extends="forceCommunity:navigationMenuBase" access="global">
+  <aura:attribute name="navigationLinkSetId" type="String" />
+  <aura:attribute name="styleClass" type="String" />
+  <aura:attribute name="menuItems" type="Object[]" />
+
+  <div>
+    <ul class="slds-list_horizontal">
+      <aura:iteration items="{! v.menuItems }" var="item">
+        <aura:if isTrue="{! item.id != 0}">
+          <li class="{! v.styleClass }">
+            <a href="javascript:void(0);" onclick="{! c.handleItemClicked }" data-id="{! item.id }">{! item.label }</a>
+          </li>
+        </aura:if>
+      </aura:iteration>
+    </ul>
+  </div>
+</aura:component>

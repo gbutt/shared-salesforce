@@ -1,0 +1,8 @@
+<design:component label="SAI Theme User Menu">
+    <design:attribute
+        name="navigationLinkSetId"
+        label="Navigation Link Set Id"
+        default="User_Profile"
+        description="Id or Developer Name of a NavigationLinkSet"
+    ></design:attribute>
+</design:component>

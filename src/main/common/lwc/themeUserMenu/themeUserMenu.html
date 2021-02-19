@@ -1,0 +1,64 @@
+<template>
+  <div class="sai-user-menu">
+    <template if:true={isGuestUser}>
+      <lightning-button
+        class="sai-user-menu_login"
+        variant="brand"
+        label="Log in"
+        onclick={handleLoginClicked}
+      >
+      </lightning-button>
+    </template>
+    <template if:false={isGuestUser}>
+      <button
+        class="sai-user-menu_menu-trigger"
+        aria-haspopup="true"
+        onclick={handleMenuClicked}
+      >
+        <span class="sai-user-menu_photo-container">
+          <img
+            src={userProfilePhotoUrl}
+            class="sai-user-menu_photo-img"
+            alt={userFullName}
+            title={userFullName}
+          />
+        </span>
+        <div class="sai-user-menu_user-name">{userFullName}</div>
+      </button>
+      <!-- <div
+        class="sai-user-menu_menu-trigger-target slds-hide"
+        tabindex="0"
+        role="menu"
+      > -->
+      <div
+        class="sai-user-menu_menu-trigger-target slds-hide"
+        tabindex="0"
+        onblur={handleMenuBlurred}
+        role="menu"
+      >
+        <ul
+          class="sai-user-menu_menu-items slds-nubbin_top-right"
+          role="presentation"
+        >
+          <li
+            for:each={navMenu}
+            for:item="item"
+            key={item.label}
+            class="sai-user-menu_menu-item slds-truncate"
+            role="presentation"
+          >
+            <a
+              class="sai-user-menu_link sai-user-menu_no-hide"
+              href={item.href}
+              onclick={handleMenuItemClicked}
+              onblur={handleMenuBlurred}
+              role="menuitem"
+              data-id={item.id}
+              >{item.label}</a
+            >
+          </li>
+        </ul>
+      </div>
+    </template>
+  </div>
+</template>

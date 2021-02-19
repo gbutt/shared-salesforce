@@ -1,0 +1,7 @@
+<design:component label="SAI Simple Navigation Menu">
+    <design:attribute
+        name="navigationLinkSetId"
+        label="Navigation Link Set Id"
+        description="Id or Developer Name of a NavigationLinkSet"
+    ></design:attribute>
+</design:component>
