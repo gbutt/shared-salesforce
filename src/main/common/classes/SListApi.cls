@@ -9,11 +9,26 @@ public class SListApi implements Iterable<SObject> {
         this.sobList = new List<SObject>(sobList);
     }
 
-    public SListApi filter(String filterField, CollectionUtils.FilterOperator operator, Object filterValue) {
+    public SListApi filter(
+        String filterField,
+        CollectionUtils.FilterOperator operator,
+        Object filterValue
+    ) {
         return this.filter(filterField, operator, filterValue, false);
     }
-    public SListApi filter(String filterField, CollectionUtils.FilterOperator operator, Object filterValue, Boolean isSObject) {
-        this.sobList = CollectionUtils.filter(sobList, filterField, operator, filterValue, isSObject);
+    public SListApi filter(
+        String filterField,
+        CollectionUtils.FilterOperator operator,
+        Object filterValue,
+        Boolean isSObject
+    ) {
+        this.sobList = CollectionUtils.filter(
+            sobList,
+            filterField,
+            operator,
+            filterValue,
+            isSObject
+        );
         return this;
     }
 
@@ -21,7 +36,7 @@ public class SListApi implements Iterable<SObject> {
         Map<Object, SObject[]> groupedCollection = CollectionUtils.groupBy(sobList, groupByField);
         Map<Id, SObject[]> idGroup = new Map<Id, SObject[]>();
         for (Object key : groupedCollection.keySet()) {
-            idGroup.put((Id)key, groupedCollection.get(key));
+            idGroup.put((Id) key, groupedCollection.get(key));
         }
         return idGroup;
     }
@@ -29,7 +44,7 @@ public class SListApi implements Iterable<SObject> {
         Map<Object, SObject[]> groupedCollection = CollectionUtils.groupBy(sobList, groupByField);
         Map<String, SObject[]> stringGroup = new Map<String, SObject[]>();
         for (Object key : groupedCollection.keySet()) {
-            stringGroup.put((String)key, groupedCollection.get(key));
+            stringGroup.put((String) key, groupedCollection.get(key));
         }
         return stringGroup;
     }
@@ -41,11 +56,11 @@ public class SListApi implements Iterable<SObject> {
     }
 
     public ListApi pluck(String fieldToPluck) {
-        Object[] result = CollectionUtils.pluck(sobList, fieldToPluck, false, new Object[] {});
+        Object[] result = CollectionUtils.pluck(sobList, fieldToPluck, false, new List<Object>{});
         return new ListApi(result);
     }
     public SListApi pluck(String fieldToPluck, Boolean isSObject) {
-        this.sobList = (SObject[])CollectionUtils.pluck(sobList, fieldToPluck, isSObject);
+        this.sobList = (SObject[]) CollectionUtils.pluck(sobList, fieldToPluck, isSObject);
         return this;
     }
 
@@ -63,17 +78,25 @@ public class SListApi implements Iterable<SObject> {
     }
 
     public SListApi difference(SObject[] sobListB) {
-        this.sobList = (SObject[])CollectionUtils.difference(sobList, sobListB, new SObject[] {});
+        this.sobList = (SObject[]) CollectionUtils.difference(
+            sobList,
+            sobListB,
+            new List<SObject>{}
+        );
         return this;
     }
 
     public SListApi intersect(SObject[] sobListB) {
-        this.sobList = (SObject[])CollectionUtils.intersect(sobList, sobListB, new SObject[] {});
+        this.sobList = (SObject[]) CollectionUtils.intersect(
+            sobList,
+            sobListB,
+            new List<SObject>{}
+        );
         return this;
     }
 
     public SListApi union(SObject[] sobListB) {
-        this.sobList = (SObject[])CollectionUtils.union(sobList, sobListB, new SObject[] {});
+        this.sobList = (SObject[]) CollectionUtils.union(sobList, sobListB, new List<SObject>{});
         return this;
     }
 
@@ -115,7 +138,11 @@ public class SListApi implements Iterable<SObject> {
     public SObject[] deepClone(Boolean preserveId, Boolean preserveReadonlyTimestamps) {
         return sobList.deepClone(preserveId, preserveReadonlyTimestamps);
     }
-    public SObject[] deepClone(Boolean preserveId, Boolean preserveReadonlyTimestamps, Boolean preserveAutonumber) {
+    public SObject[] deepClone(
+        Boolean preserveId,
+        Boolean preserveReadonlyTimestamps,
+        Boolean preserveAutonumber
+    ) {
         return sobList.deepClone(preserveId, preserveReadonlyTimestamps, preserveAutonumber);
     }
 

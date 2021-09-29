@@ -14,3 +14,6 @@ package.xml
 **/profiles/**
 
 **/*.md
+
+**/aura/saiThemeUserMenu
+**/lwc/themeUserMenu
