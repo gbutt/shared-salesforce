@@ -4,8 +4,7 @@ import isGuest from '@salesforce/user/isGuest';
 import basePath from '@salesforce/community/basePath';
 
 // TODO: replace with LDS. This method queries data from the current user
-import getMenuData from '@salesforce/apex/CustomProfileMenuController.getMenuData';
-import jsUtils from 'c/jsUtils';
+// import getMenuData from '@salesforce/apex/CustomProfileMenuController.getMenuData';
 
 const basePathWoS = basePath.replace('/s', '');
 const menuOverrides = [
@@ -45,12 +44,12 @@ export default class ThemeUserMenu extends LightningElement {
     loginHref = basePathWoS + '/s/login';
 
     connectedCallback() {
-        getMenuData().then((menuData) => {
-            this.userProfilePhotoUrl = menuData.user.SmallPhotoUrl;
-            this.userFullName = menuData.user.Name;
-            this.userType = menuData.user.UserType;
-            this.buildMenu();
-        });
+        // getMenuData().then((menuData) => {
+        //     this.userProfilePhotoUrl = menuData.user.SmallPhotoUrl;
+        //     this.userFullName = menuData.user.Name;
+        //     this.userType = menuData.user.UserType;
+        //     this.buildMenu();
+        // });
     }
 
     handleMenuClicked(event) {

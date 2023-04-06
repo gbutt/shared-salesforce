@@ -6,7 +6,8 @@
         {
             "label": "sfdx-push",
             "type": "shell",
-            "command": "sfdx force:source:push"
+            "command": "sfdx force:source:push",
+            "problemMatcher": []
         },
         {
             "label": "sfdx-push-force",
