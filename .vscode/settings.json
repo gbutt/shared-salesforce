@@ -17,5 +17,6 @@
     "git.ignoreLimitWarning": true,
     "prettier.configPath": "config/prettier.config.js",
     "prettier.ignorePath": "config/.prettierignore",
-    "uncrustify.configPath.osx": "config/uncrustify.cfg"
+    "uncrustify.configPath.osx": "config/uncrustify.cfg",
+    "xml.preferences.showSchemaDocumentationType": "none"
 }

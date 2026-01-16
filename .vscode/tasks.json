@@ -6,7 +6,7 @@
         {
             "label": "sfdx-push",
             "type": "shell",
-            "command": "sfdx force:source:push",
+            "command": "sf project deploy start",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -16,23 +16,23 @@
         {
             "label": "sfdx-push-force",
             "type": "shell",
-            "command": "sfdx force:source:push -f"
+            "command": "sf project deploy start -f"
         },
         {
             "label": "sfdx-jest-test",
             "type": "shell",
-            "command": "npm run test:unit"
+            "command": "npm run test:lwc"
         },
         {
             "label": "sfdx-apex-test",
             "type": "shell",
-            "command": "sfdx force:apex:test:run -n ${fileBasenameNoExtension} -w 10 -c -r human",
+            "command": "sf apex test run -n ${fileBasenameNoExtension} -w 10",
             "problemMatcher": []
         },
         {
             "label": "sfdx-apex-all-tests",
             "type": "shell",
-            "command": "sfdx force:apex:test:run -w 10 -c -r human",
+            "command": "npm run test:apex",
             "problemMatcher": []
         }
     ]
