@@ -15,7 +15,7 @@
     QueueableDispatcher.schedule(chain);
 
     // schedule multiple queueables in a chain
-    MyQueueableChain chain = new MyQueueableChain(new Queueable[]{ queueable1, queueable2, ... });
+    MyQueueableChain chain = new MyQueueableChain(new List<Queueable>{ queueable1, queueable2, ... });
     QueueableDispatcher.schedule(chain);
 
 
@@ -43,7 +43,7 @@ public abstract class QueueableChain implements Queueable, Database.AllowsCallou
 
     // instance properties
 
-    public Queueable[] queueableStack {get;set;}
+    public List<Queueable> queueableStack {get;set;}
     public Boolean stopOnError {get;set;}
     public Boolean rollbackOnError {get;set;}
 
@@ -51,15 +51,15 @@ public abstract class QueueableChain implements Queueable, Database.AllowsCallou
     public QueueableChain() {
         this.stopOnError = false;
         this.rollbackOnError = true;
-        this.queueableStack = new Queueable[]{};
+        this.queueableStack = new List<Queueable>{};
     }
 
     public QueueableChain(Queueable task) {
         this();
-        this.queueableStack = new Queueable[]{task};
+        this.queueableStack = new List<Queueable>{task};
     }
 
-    public QueueableChain(Queueable[] tasks) {
+    public QueueableChain(List<Queueable> tasks) {
         this();
         this.queueableStack = tasks;
     }
@@ -70,7 +70,7 @@ public abstract class QueueableChain implements Queueable, Database.AllowsCallou
 
     // note - new tasks are prioritized first!
     public void pushTasks(QueueableChain newChain) {
-        Queueable[] tempStack = newChain.queueableStack.clone();
+        List<Queueable> tempStack = newChain.queueableStack.clone();
         tempStack.addAll(this.queueableStack);
         this.queueableStack = tempStack;
     }

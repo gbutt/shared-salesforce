@@ -69,7 +69,7 @@ public class JsonReader {
     }
 
     public Object getFieldAtPath(String path) {
-        String[] pathParts = path.split('\\.');
+        List<String> pathParts = path.split('\\.');
         if (pathParts.size() == 0) {
             return getFieldOrIndex(this.jsonObj, path);
         }
@@ -93,12 +93,12 @@ public class JsonReader {
     }
 
     private Object getFieldByIndex(Object json, String path) {
-        String[] partWithIndices = path.split('\\[');
+        List<String> partWithIndices = path.split('\\[');
         String part = partWithIndices.remove(0);
         Object tempResult = ((Map<String, Object>)json).get(part);
         for (String indexStr : partWithIndices) {
             Integer idx = Integer.valueOf(indexStr.removeEnd(']'));
-            tempResult = ((Object[])tempResult).get(idx);
+            tempResult = ((List<Object>)tempResult).get(idx);
         }
         return tempResult;
     }

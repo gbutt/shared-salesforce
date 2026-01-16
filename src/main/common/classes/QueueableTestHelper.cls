@@ -7,7 +7,7 @@ public class QueueableTestHelper {
         QueueableDispatcher.executor = executor;
     }
 
-    public static QueueableChain[] getEnqueuedChains() {
+    public static List<QueueableChain> getEnqueuedChains() {
         return executor.enqueuedChains;
     }
 
@@ -37,14 +37,16 @@ public class QueueableTestHelper {
     }
 
     public class TestQueueableExecutor extends QueueableDispatcher.QueueableExecutor {
-        public QueueableChain[] enqueuedChains {get; set;}
+        public List<QueueableChain> enqueuedChains {get; set;}
 
         public TestQueueableExecutor() {
-            enqueuedChains = new QueueableChain[] {};
+            enqueuedChains = new List<TestQueueableChain> {};
         }
 
         public override void addToApexJobQueue(QueueableChain taskChain) {
             enqueuedChains.add(taskChain);
         }
     }
+
+    public class TestQueueableChain extends QueueableChain {}
 }

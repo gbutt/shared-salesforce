@@ -10,7 +10,7 @@ public without sharing class LoggerFactory {
         log.setCategory(LoggerFactory.class.getName());
         DEFAULT_LOGGER_BLUEPRINT = new LoggerBlueprint();
         logLevels = buildLogLevelsMap();
-        LoggerConfig__mdt[] configs = [SELECT MasterLabel, Log_Threshold__c, Logger_Class__c, Flush_Threshold__c FROM LoggerConfig__mdt];
+        List<LoggerConfig__mdt> configs = [SELECT MasterLabel, Log_Threshold__c, Logger_Class__c, Flush_Threshold__c FROM LoggerConfig__mdt];
         initializeLoggerBlueprints(configs);
     }
 
@@ -46,7 +46,7 @@ public without sharing class LoggerFactory {
     }
 
     @TestVisible
-    private static void initializeLoggerBlueprints(LoggerConfig__mdt[] configs) {
+    private static void initializeLoggerBlueprints(List<LoggerConfig__mdt> configs) {
         loggerBlueprints = new Map<String, LoggerBlueprint> {
             'DEFAULT' => DEFAULT_LOGGER_BLUEPRINT
         };

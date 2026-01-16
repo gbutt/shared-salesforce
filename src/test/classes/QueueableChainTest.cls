@@ -6,7 +6,7 @@ public class QueueableChainTest {
 		// given - a chain with a single queueable
         QueueableTestHelper.setupTestExecutor();
 		TestQueueable task = new TestQueueable();
-		QueueableChain chain = new TestQueueableChain();
+		QueueableChain chain = new QueueableTestHelper.TestQueueableChain();
         chain.enqueue(task);
 
 		// when - the chain executes
@@ -16,7 +16,7 @@ public class QueueableChainTest {
         System.assertEquals(chain, QueueableDispatcher.currentlyExecutingChain);
 		System.assertEquals(true, task.hasExecuted);
         // then - the chain is depleted
-        QueueableChain[] enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
+        List<QueueableChain> enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
         System.assertEquals(0, enqueuedChains.size());
 	}
 
@@ -26,7 +26,7 @@ public class QueueableChainTest {
         QueueableTestHelper.setupTestExecutor();
 		TestQueueable task1 = new TestQueueable();
         TestQueueable task2 = new TestQueueable();
-		QueueableChain chain = new TestQueueableChain();
+		QueueableChain chain = new QueueableTestHelper.TestQueueableChain();
         chain.enqueue(task1);
         chain.enqueue(task2);
 
@@ -34,7 +34,7 @@ public class QueueableChainTest {
         chain.execute(null);
 
 		// then - the second queueable is registered in the remaining chain
-		QueueableChain[] enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
+		List<QueueableChain> enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
         System.assertEquals(1, enqueuedChains.size());
         System.assertEquals(1, enqueuedChains[0].queueableStack.size());
         System.assertEquals(task2, enqueuedChains[0].queueableStack[0]);
@@ -44,10 +44,10 @@ public class QueueableChainTest {
     static void it_should_push_new_queueables() {
         // given - two chains with one queueable in each
         TestQueueable task1 = new TestQueueable();
-        QueueableChain chain1 = new TestQueueableChain();
+        QueueableChain chain1 = new QueueableTestHelper.TestQueueableChain();
         chain1.enqueue(task1);
         TestQueueable task2 = new TestQueueable();
-        QueueableChain chain2 = new TestQueueableChain();
+        QueueableChain chain2 = new QueueableTestHelper.TestQueueableChain();
         chain2.enqueue(task2);
 
 		// when - we push the second chain onto the first
@@ -68,7 +68,7 @@ public class QueueableChainTest {
         task1.exceptionToThrow = new TestException('test');
         task1.dmlToRollback = new Account(Name = 'test');
         TestQueueable task2 = new TestQueueable();
-		QueueableChain chain1 = new TestQueueableChain();
+		QueueableChain chain1 = new QueueableTestHelper.TestQueueableChain();
         chain1.enqueue(task1);
         chain1.enqueue(task2);
 
@@ -86,7 +86,7 @@ public class QueueableChainTest {
         // then - the transaction is rolled back
         System.assertEquals(0, [SELECT Id FROM Account WHERE ID = :task1.dmlToRollback.Id].size());
         // then - the remaining chain is not enqueued
-        QueueableChain[] enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
+        List<QueueableChain> enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
         System.assertEquals(0, enqueuedChains.size());
     }
 
@@ -98,7 +98,7 @@ public class QueueableChainTest {
         task1.exceptionToThrow = new TestException('test');
         task1.dmlToRollback = new Account(Name = 'test');
 		TestQueueable task2 = new TestQueueable();
-		QueueableChain chain1 = new TestQueueableChain();
+		QueueableChain chain1 = new QueueableTestHelper.TestQueueableChain();
         chain1.enqueue(task1);
         chain1.enqueue(task2);
 
@@ -109,11 +109,9 @@ public class QueueableChainTest {
         // then - no exception is thrown, and the dml is not rolled back
         System.assertEquals(1, [SELECT Id FROM Account WHERE ID = :task1.dmlToRollback.Id].size());
         // then - the remaining chain is enqueued
-        QueueableChain[] enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
+        List<QueueableChain> enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
         System.assertEquals(1, enqueuedChains.size());
     }
-
-    public class TestQueueableChain extends QueueableChain {}
 
     public class TestQueueable implements Queueable {
         public Boolean hasExecuted {get;set;}

@@ -1,12 +1,12 @@
 public without sharing class LogEventHandler extends BaseProcessor {
-    LogEvent__e[] events {get; set;}
+    List<LogEvent__e> events {get; set;}
 
-    public LogEventHandler(LogEvent__e[] events) {
+    public LogEventHandler(List<LogEvent__e> events) {
         this.events = events;
     }
 
     protected override void doExecute() {
-        Log__c[] entries = new Log__c[] {};
+        List<Log__c> entries = new List<Log__c> {};
         for (LogEvent__e event : events) {
             Log__c entry = new Log__c(
                 Category__c = event.Category__c

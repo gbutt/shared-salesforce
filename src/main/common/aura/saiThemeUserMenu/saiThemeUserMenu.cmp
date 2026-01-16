@@ -1,6 +1,7 @@
-<aura:component implements="forceCommunity:profileMenuInterface" extends="forceCommunity:navigationMenuBase" access="global">
+<aura:component implements="forceCommunity:profileMenuInterface" extends="forceCommunity:navigationMenuBase"
+  access="global">
   <aura:attribute name="navigationLinkSetId" type="String" default="User_Profile" />
-  <aura:attribute name="menuItems" type="Object[]" />
+  <aura:attribute name="menuItems" type="List<Object>" />
 
   <c:themeUserMenu menuItems="{!v.menuItems}" onnavigate="{! c.handleNavigation }" />
 </aura:component>

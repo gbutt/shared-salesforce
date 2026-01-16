@@ -18,9 +18,9 @@ public class CollectionUtils {
         filterValue - value to compare to filterField
         returns - a filtered list of SObjects
         Example
-        Contact[] result = (Contact[])CollectionUtils.filter(contacts, 'LastName', CollectionUtils.FilterOperator.EQUALS, 'Test');
+        List<Contact> result = (List<Contact>)CollectionUtils.filter(contacts, 'LastName', CollectionUtils.FilterOperator.EQUALS, 'Test');
      */
-    public static SObject[] filter(SObject[] sobList, String filterField, FilterOperator operator, Object filterValue) {
+    public static List<SObject> filter(List<SObject> sobList, String filterField, FilterOperator operator, Object filterValue) {
         return filter(sobList, filterField, operator, filterValue, false);
     }
     /*  Filters a list of SObjects by an sobject value
@@ -31,11 +31,11 @@ public class CollectionUtils {
         isSObject - true when filterValue is an SObject
         returns - a filtered list of SObjects
         Example
-        Contact[] result = (Contact[])CollectionUtils.filter(contacts, 'Account', CollectionUtils.FilterOperator.EQUALS, acct, true);
+        List<Contact> result = (List<Contact>)CollectionUtils.filter(contacts, 'Account', CollectionUtils.FilterOperator.EQUALS, acct, true);
      */
-    public static SObject[] filter(SObject[] sobList, String filterField, FilterOperator operator, Object filterValue, Boolean isSObject) {
-        SObject[] result = new SObject[] {};
-        String[] fieldParts = filterField.split('\\.');
+    public static List<SObject> filter(List<SObject> sobList, String filterField, FilterOperator operator, Object filterValue, Boolean isSObject) {
+        List<SObject> result = new List<SObject> {};
+        List<String> fieldParts = filterField.split('\\.');
         for (SObject sob : sobList) {
             Object foundValue = getValueFromSObject(sob, fieldParts, isSObject);
             if (evalOperator(foundValue, operator, filterValue)) {
@@ -49,15 +49,15 @@ public class CollectionUtils {
     /*  Filters a list of Objects by a value
         This version will try to convert the result list to a detected list type. It is preferred to pass the list to fill as the last parameter.
         Example:
-        Integer[] result = (Integer[])CollectionUtils.filter(integers, CollectionUtils.FilterOperator.GREATER_THAN, 3, new Integer[]{});
+        List<Integer> result = (List<Integer>)CollectionUtils.filter(integers, CollectionUtils.FilterOperator.GREATER_THAN, 3, new List<Integer>{});
         is preferred over
-        Integer[] result = (Integer[])CollectionUtils.filter(integers, CollectionUtils.FilterOperator.GREATER_THAN, 3);
+        List<Integer> result = (List<Integer>)CollectionUtils.filter(integers, CollectionUtils.FilterOperator.GREATER_THAN, 3);
      */
-    public static Object[] filter(Object[] objList, FilterOperator operator, Object filterValue) {
-        Object[] result = filter(objList, operator, filterValue, new Object[] {});
+    public static List<Object> filter(List<Object> objList, FilterOperator operator, Object filterValue) {
+        List<Object> result = filter(objList, operator, filterValue, new List<Object> {});
         return convertObjectList(result);  // all values should have uniform type, so we should convert result to a concrete type
     }
-    public static Object[] filter(Object[] objList, FilterOperator operator, Object filterValue, Object[] result) {
+    public static List<Object> filter(List<Object> objList, FilterOperator operator, Object filterValue, List<Object> result) {
         for (Object obj : objList) {
             if (evalOperator(obj, operator, filterValue)) {
                 result.add(obj);
@@ -75,7 +75,7 @@ public class CollectionUtils {
                 'Group2': [ {Name: 'Group2'} ]
             }
      */
-    public static Map<Object, SObject[]> groupBy(SObject[] sobList, String groupByField) {
+    public static Map<Object, List<SObject>> groupBy(List<SObject> sobList, String groupByField) {
         return groupBy(sobList, groupByField, false);
     }
     /* Groups a list of sobjects by an sobject field
@@ -87,15 +87,15 @@ public class CollectionUtils {
                 Group2Acct: [ {Account: Group2Acct} ]
             }
      */
-    public static Map<Object, SObject[]> groupBy(SObject[] sobList, String groupByField, Boolean isSObject) {
-        Map<Object, SObject[]> result = new Map<Object, SObject[]>();
-        String[] fieldParts = groupByField.split('\\.');
+    public static Map<Object, List<SObject>> groupBy(List<SObject> sobList, String groupByField, Boolean isSObject) {
+        Map<Object, List<SObject>> result = new Map<Object, List<SObject>>();
+        List<String> fieldParts = groupByField.split('\\.');
         for (SObject sob : sobList) {
             // navigate parents to find group value
             Object groupbyValue = getValueFromSObject(sob, fieldParts, isSObject);
             // group sobjects by group value
             if (!result.containsKey(groupbyValue)) {
-                result.put(groupbyValue, new SObject[] {});
+                result.put(groupbyValue, new List<SObject> {});
             }
             result.get(groupbyValue).add(sob);
         }
@@ -105,20 +105,20 @@ public class CollectionUtils {
     /*  Gets the value of a field from an sobject list and returns the values as a list.
         This version will try to convert the result list to a detected list type. It is preferred to pass the list to fill as the last parameter.
         Example:
-        Id[] accountIds = (Id[])CollectionUtils.pluck(contacts, 'AccountId', new Id[]{});
+        List<Id> accountIds = (List<Id>)CollectionUtils.pluck(contacts, 'AccountId', new List<Id>{});
         is preferred over
-        Id[] accountIds = (Id[])CollectionUtils.pluck(contacts, 'AccountId');
+        List<Id> accountIds = (List<Id>)CollectionUtils.pluck(contacts, 'AccountId');
      */
-    public static Object[] pluck(SObject[] sobList, String fieldToPluck) {
-        return pluck(sobList, fieldToPluck, false, new Object[] {});
+    public static List<Object> pluck(List<SObject> sobList, String fieldToPluck) {
+        return pluck(sobList, fieldToPluck, false, new List<Object> {});
     }
-    public static SObject[] pluck(SObject[] sobList, String fieldToPluck, Boolean isSObject) {
-        return (SObject[])pluck(sobList, fieldToPluck, isSObject, new SObject[] {});
+    public static List<SObject> pluck(List<SObject> sobList, String fieldToPluck, Boolean isSObject) {
+        return (List<SObject>)pluck(sobList, fieldToPluck, isSObject, new List<SObject> {});
     }
-    public static Object[] pluck(SObject[] sobList, String fieldToPluck, Object[] result) {
+    public static List<Object> pluck(List<SObject> sobList, String fieldToPluck, List<Object> result) {
         return pluck(sobList, fieldToPluck, false, result);
     }
-    public static Object[] pluck(SObject[] sobList, String fieldToPluck, Boolean isSObject, Object[] result) {
+    public static List<Object> pluck(List<SObject> sobList, String fieldToPluck, Boolean isSObject, List<Object> result) {
         for (SObject sob : sobList) {
             Object value = getValueFromSObject(sob, fieldToPluck, isSObject);
             result.add(value);
@@ -128,19 +128,19 @@ public class CollectionUtils {
 
     /*  Converts a multi-dimensional array into a single-dimension array
         Example:
-        Object[] integers = [1, 2, [3, 4, [5]]]
-        Integer[] result = (Integer[])CollectionUtils.flatten(integers);
+        List<Object> integers = [1, 2, [3, 4, [5]]]
+        List<Integer> result = (List<Integer>)CollectionUtils.flatten(integers);
         result = [1, 2, 3, 4, 5]
         This version will try to convert the result list to a detected list type. It is preferred to pass the list to fill as the last parameter.
-        Integer[] result = (Integer[])CollectionUtils.flatten(integers, new Integer[]{});
+        List<Integer> result = (List<Integer>)CollectionUtils.flatten(integers, new List<Integer>{});
      */
-    public static Object[] flatten(Object[] objList) {
-        return flatten(objList, new Object[] {});
+    public static List<Object> flatten(List<Object> objList) {
+        return flatten(objList, new List<Object> {});
     }
-    public static Object[] flatten(Object[] objList, Object[] result) {
+    public static List<Object> flatten(List<Object> objList, List<Object> result) {
         for (Object obj : objList) {
-            if (obj instanceof Object[]) {
-                result.addAll(flatten((Object[])obj));
+            if (obj instanceof List<Object>) {
+                result.addAll(flatten((List<Object>)obj));
             } else {
                 result.add(obj);
             }
@@ -154,7 +154,7 @@ public class CollectionUtils {
             sobjects = [ {Name: 'Test'}, {Name: null} ]
             RETURNS [ {Name: 'Test'} ]
      */
-    public static SObject[] removeNulls(SObject[] sobList, String nullField) {
+    public static List<SObject> removeNulls(List<SObject> sobList, String nullField) {
         return removeNulls(sobList, nullField, false);
     }
 
@@ -164,9 +164,9 @@ public class CollectionUtils {
             sobjects = [ {Account: TestAcct}, {Account: null} ]
             RETURNS [ {Account: TestAcct} ]
      */
-    public static SObject[] removeNulls(SObject[] sobList, String nullField, Boolean isSObject) {
-        SObject[] result = new SObject[] {};
-        Map<Object, SObject[]> groupedResults = groupBy(sobList, nullField, isSObject);
+    public static List<SObject> removeNulls(List<SObject> sobList, String nullField, Boolean isSObject) {
+        List<SObject> result = new List<SObject> {};
+        Map<Object, List<SObject>> groupedResults = groupBy(sobList, nullField, isSObject);
         for (Object key : groupedResults.keyset()) {
             if (key != null) {
                 result.addAll(groupedResults.get(key));
@@ -181,10 +181,10 @@ public class CollectionUtils {
             list = [ 1, null, 2, null ]
             RETURNS [ 1, 2 ]
      */
-    public static Object[] removeNulls(Object[] objList) {
-        return removeNulls(objList, new Object[] {});
+    public static List<Object> removeNulls(List<Object> objList) {
+        return removeNulls(objList, new List<Object> {});
     }
-    public static Object[] removeNulls(Object[] objList, Object[] result) {
+    public static List<Object> removeNulls(List<Object> objList, List<Object> result) {
         for (Object obj : objList) {
             if (obj != null) {
                 result.add(obj);
@@ -199,7 +199,7 @@ public class CollectionUtils {
             B = [3,4,5]
             difference = [1,2]
      */
-    public static Object[] difference(Object[] objListA, Object[] objListB, Object[] result) {
+    public static List<Object> difference(List<Object> objListA, List<Object> objListB, List<Object> result) {
         Set<Object> resultSet = new Set<Object>(objListA);
         resultSet.removeAll(objListB);
         result.addAll(resultSet);
@@ -212,7 +212,7 @@ public class CollectionUtils {
             B = [3,4,5]
             intersect = [3]
      */
-    public static Object[] intersect(Object[] objListA, Object[] objListB, Object[] result) {
+    public static List<Object> intersect(List<Object> objListA, List<Object> objListB, List<Object> result) {
         Set<Object> resultSet = new Set<Object>(objListA);
         resultSet.retainAll(objListB);
         result.addAll(resultSet);
@@ -225,7 +225,7 @@ public class CollectionUtils {
             B = [3,4,5]
             union = [1,2,3,4,5]
      */
-    public static Object[] union(Object[] objListA, Object[] objListB, Object[] result) {
+    public static List<Object> union(List<Object> objListA, List<Object> objListB, List<Object> result) {
         Set<Object> resultSet = new Set<Object>(objListA);
         resultSet.addAll(objListB);
         result.addAll(resultSet);
@@ -234,8 +234,8 @@ public class CollectionUtils {
 
     /* Converts an object list to an SObject list
      */
-    public static SObject[] toSObjectList(Object[] objList) {
-        SObject[] newList = new SObject[] {};
+    public static List<SObject> toSObjectList(List<Object> objList) {
+        List<SObject> newList = new List<SObject> {};
         for (Object obj : objList) {
             SObject newObj = (SObject)obj;
             newList.add(newObj);
@@ -245,8 +245,8 @@ public class CollectionUtils {
 
     /* Converts an object list to a String list
      */
-    public static String[] toStringList(Object[] objList) {
-        String[] newList = new String[] {};
+    public static List<String> toStringList(List<Object> objList) {
+        List<String> newList = new List<String> {};
         for (Object obj : objList) {
             String newObj = null;
             if (obj instanceof String) {
@@ -261,15 +261,15 @@ public class CollectionUtils {
 
     /* Converts an object list to a Id list
      */
-    public static Id[] toIdList(Object[] objList) {
-        Id[] newList = (Id[])toStringList(objList);
+    public static List<Id> toIdList(List<Object> objList) {
+        List<Id> newList = (List<Id>)toStringList(objList);
         return newList;
     }
 
     /* Converts an object list to a Integer list
      */
-    public static Integer[] toIntegerList(Object[] objList) {
-        Integer[] newList = new Integer[] {};
+    public static List<Integer> toIntegerList(List<Object> objList) {
+        List<Integer> newList = new List<Integer> {};
         for (Object obj : objList) {
             Integer newObj = null;
             if (obj instanceof Integer) {
@@ -284,8 +284,8 @@ public class CollectionUtils {
 
     /* Converts an object list to a Long list
      */
-    public static Long[] toLongList(Object[] objList) {
-        Long[] newList = new Long[] {};
+    public static List<Long> toLongList(List<Object> objList) {
+        List<Long> newList = new List<Long> {};
         for (Object obj : objList) {
             Long newObj = null;
             if (obj instanceof Long) {
@@ -300,8 +300,8 @@ public class CollectionUtils {
 
     /* Converts an object list to a Double list
      */
-    public static Double[] toDoubleList(Object[] objList) {
-        Double[] newList = new Double[] {};
+    public static List<Double> toDoubleList(List<Object> objList) {
+        List<Double> newList = new List<Double> {};
         for (Object obj : objList) {
             Double newObj = null;
             if (obj instanceof Double) {
@@ -316,8 +316,8 @@ public class CollectionUtils {
 
     /* Converts an object list to a Decimal list
      */
-    public static Decimal[] toDecimalList(Object[] objList) {
-        Decimal[] newList = new Decimal[] {};
+    public static List<Decimal> toDecimalList(List<Object> objList) {
+        List<Decimal> newList = new List<Decimal> {};
         for (Object obj : objList) {
             Decimal newObj = null;
             if (obj instanceof Decimal) {
@@ -332,8 +332,8 @@ public class CollectionUtils {
 
     /* Converts an object list to a Boolean list
      */
-    public static Boolean[] toBooleanList(Object[] objList) {
-        Boolean[] newList = new Boolean[] {};
+    public static List<Boolean> toBooleanList(List<Object> objList) {
+        List<Boolean> newList = new List<Boolean> {};
         for (Object obj : objList) {
             Boolean newObj = null;
             if (obj instanceof Boolean) {
@@ -348,8 +348,8 @@ public class CollectionUtils {
 
     /* Converts an object list to a Date list
      */
-    public static Date[] toDateList(Object[] objList) {
-        Date[] newList = new Date[] {};
+    public static List<Date> toDateList(List<Object> objList) {
+        List<Date> newList = new List<Date> {};
         for (Object obj : objList) {
             Date newObj = null;
             if (obj instanceof Date) {
@@ -366,8 +366,8 @@ public class CollectionUtils {
 
     /* Converts an object list to a DateTime list
      */
-    public static DateTime[] toDateTimeList(Object[] objList) {
-        DateTime[] newList = new DateTime[] {};
+    public static List<Datetime> toDateTimeList(List<Object> objList) {
+        List<Datetime> newList = new List<Datetime> {};
         for (Object obj : objList) {
             DateTime newObj = null;
             if (obj instanceof DateTime) {
@@ -384,8 +384,8 @@ public class CollectionUtils {
 
     /* Converts an object list to a Time list
      */
-    public static Time[] toTimeList(Object[] objList) {
-        Time[] newList = new Time[] {};
+    public static List<Time> toTimeList(List<Object> objList) {
+        List<Time> newList = new List<Time> {};
         for (Object obj : objList) {
             Time newObj = (Time)obj;
             newList.add(newObj);
@@ -395,8 +395,8 @@ public class CollectionUtils {
 
     /* Converts an object list to a Blob list
      */
-    public static Blob[] toBlobList(Object[] objList) {
-        Blob[] newList = new Blob[] {};
+    public static List<Blob> toBlobList(List<Object> objList) {
+        List<Blob> newList = new List<Blob> {};
         for (Object obj : objList) {
             Blob newObj = null;
             if (obj instanceof Blob) {
@@ -454,11 +454,11 @@ public class CollectionUtils {
      */
     @TestVisible
     private static Object getValueFromSObject(SObject sob, String field, Boolean isSObject) {
-        String[] parts = field.split('\\.');
+        List<String> parts = field.split('\\.');
         return getValueFromSObject(sob, parts, isSObject);
     }
 
-    private static Object getValueFromSObject(SObject sob, String[] parts, Boolean isSObject) {
+    private static Object getValueFromSObject(SObject sob, List<String> parts, Boolean isSObject) {
         // navigate parents to find field
         Object foundValue = null;
         SObject parent = sob;
@@ -564,7 +564,7 @@ public class CollectionUtils {
                 return evalOperator(leftValue, FilterOperator.EQUALS, rightValue) || evalOperator(leftValue, FilterOperator.LESS_THAN, rightValue);
             }
             when IN_LIST {
-                return ((Object[])rightValue).contains(leftValue);
+                return ((List<Object>)rightValue).contains(leftValue);
             }
         }
         if (!supportsOperator(operator, leftValue, rightValue)) {
@@ -595,7 +595,7 @@ public class CollectionUtils {
     }
 
     @TestVisible
-    private static Object[] convertObjectList(Object[] objList) {
+    private static List<Object> convertObjectList(List<Object> objList) {
         String detectedType = '';
         for (Object obj : objList) {
             detectedType = getType(obj);

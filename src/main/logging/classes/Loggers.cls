@@ -2,14 +2,14 @@ public class Loggers {
     public static Boolean forceFlushAsync;
 
     public class SystemLogger extends LoggerBase {
-        protected override void writeLogItems(LogItem[] items) {
+        protected override void writeLogItems(List<LogItem> items) {
             System.debug('Logs flushed');
         }
     }
 
     public without sharing class ObjectLogger extends LoggerBase {
-        protected override void writeLogItems(LogItem[] items) {
-            Log__c[] entries = new Log__c[] {};
+        protected override void writeLogItems(List<LogItem> items) {
+            List<Log__c> entries = new List<Log__c> {};
             for (LogItem item : items) {
                 Log__c entry = new Log__c(
                     Category__c = item.category
@@ -25,8 +25,8 @@ public class Loggers {
     }
 
     public class EventLogger extends LoggerBase {
-        protected override void writeLogItems(LogItem[] items) {
-            LogEvent__e[] events = new LogEvent__e[] {};
+        protected override void writeLogItems(List<LogItem> items) {
+            List<LogEvent__e> events = new List<LogEvent__e> {};
             for (LogItem item : items) {
                 LogEvent__e event = new LogEvent__e(
                     Category__c = item.category
@@ -67,7 +67,7 @@ public class Loggers {
 
     public abstract class AggregateLogger extends LoggerBase {
         protected abstract void writeAggregateItem(LogItem aggregateItem);
-        protected override void writeLogItems(LogItem[] items) {
+        protected override void writeLogItems(List<LogItem> items) {
             LogItem aggregateItem;
             if (items.size() == 1) {
                 aggregateItem = items[0];
@@ -75,7 +75,7 @@ public class Loggers {
             } else {
                 LogItem lastLogEntry = items[items.size() - 1];
                 LoggingLevel maxLogLevel = lastLogEntry.logLevel;
-                String[] messages = new String[] {};
+                List<String> messages = new List<String> {};
                 for (LogItem item : items) {
                     messages.add(item.printLog());
                     if (item.logLevel.ordinal() > maxLogLevel.ordinal()) {
@@ -94,16 +94,16 @@ public class Loggers {
 
     public abstract class LoggerBase implements Logger {
         @TestVisible
-        private LogItem[] queue {get; set;}
+        private List<LogItem> queue {get; set;}
         private LoggingLevel logThreshold {get; set;}
         private LoggingLevel flushThreshold {get; set;}
         private String category {get; set;}
 
         public LoggerBase() {
-            queue = new LogItem[] {};
+            queue = new List<LogItem> {};
         }
 
-        protected abstract void writeLogItems(LogItem[] items);
+        protected abstract void writeLogItems(List<LogItem> items);
 
         public virtual LoggingLevel getLogThreshold() {
             return logThreshold != null ? logThreshold : LoggingLevel.DEBUG;
@@ -165,8 +165,8 @@ public class Loggers {
                 return;
             }
 
-            LogItem[] items = queue;
-            queue = new LogItem[] {};
+            List<LogItem> items = queue;
+            queue = new List<LogItem> {};
             writeLogItems(items);
         }
 
@@ -249,7 +249,7 @@ public class Loggers {
         }
 
         public String printLog() {
-            return String.format(logLineTemplate, new String[] {
+            return String.format(logLineTemplate, new List<String> {
                 logTime.formatGmt('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\''),
                 category,
                 logLevel.name(),

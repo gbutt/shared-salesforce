@@ -2,10 +2,10 @@
 public class SListApiTest {
     @IsTest
     static void example() {
-        Contact[] contacts = buildContactList();
+        List<Contact> contacts = buildContactList();
 
         // do some filtering and grouping of our contacts
-        Map<Object, SObject[]> result = new SListApi(contacts)
+        Map<Object, List<SObject>> result = new SListApi(contacts)
             .removeNulls('Account.Name')  // remove contacts whose account name is null
             .filter('Account.Id', CollectionUtils.FilterOperator.EQUALS, IdUtils.id(0, Account.SObjectType))  // find contacts with account id = 0
             .groupBy('LastName');  // group results by last name
@@ -15,34 +15,34 @@ public class SListApiTest {
         System.assert(result.keySet().contains('Test3'));
 
         // convert object map to concrete map
-        Map<String, Contact[]> concreteResult = new Map<String, Contact[]>();
+        Map<String, List<Contact>> concreteResult = new Map<String, List<Contact>>();
         for (Object key : result.keySet()) {
-            concreteResult.put((String)key, (Contact[])result.get(key));
+            concreteResult.put((String)key, (List<Contact>)result.get(key));
         }
 
         // convert map values into a flat list
-        Contact[] values = (Contact[])new ListApi(result.values())
+        List<Contact> values = (List<Contact>)new ListApi(result.values())
             .flatten()
-            .toList(new Contact[] {});
+            .toList(new List<Contact> {});
 
         System.assertEquals(2, values.size());
         System.assertEquals(contacts[0], values[0]);
         System.assertEquals(contacts[3], values[1]);
 
         // group by an sobject field
-        Map<Object, SObject[]> groupResult = new SListApi(contacts)
+        Map<Object, List<SObject>> groupResult = new SListApi(contacts)
             .groupBy('Account', true);
 
         System.assertEquals(3, groupResult.keySet().size());
 
         // convert object map to concrete map
-        Map<Account, Contact[]> concreteGroupResult = new Map<Account, Contact[]>();
+        Map<Account, List<Contact>> concreteGroupResult = new Map<Account, List<Contact>>();
         for (Object key : groupResult.keySet()) {
-            concreteGroupResult.put((Account)key, (Contact[])groupResult.get(key));
+            concreteGroupResult.put((Account)key, (List<Contact>)groupResult.get(key));
         }
 
         // pluck unique accounts from contacts
-        Account[] accounts = (Account[])new SListApi(contacts)
+        List<Account> accounts = (List<Account>)new SListApi(contacts)
             .pluck('Account', true)
             .removeDuplicates()
             .toList();
@@ -50,16 +50,16 @@ public class SListApiTest {
         System.assertEquals(3, accounts.size());
 
         // pluck unique last names from contacts
-        String[] lastNames = (String[])new SListApi(contacts)
+        List<String> lastNames = (List<String>)new SListApi(contacts)
             .pluck('LastName')
             .removeDuplicates()
-            .toList(new String[] {});
+            .toList(new List<String> {});
 
         System.assertEquals(3, accounts.size());
 
         // get all contacts not in the second list using difference
-        Contact[] diffResult = (Contact[])new SListApi(contacts)
-            .difference(new Contact[] { contacts[0], contacts[1], contacts[2], new Contact(FirstName = 'new') })
+        List<Contact> diffResult = (List<Contact>)new SListApi(contacts)
+            .difference(new List<Contact> { contacts[0], contacts[1], contacts[2], new Contact(FirstName = 'new') })
             .toList();
 
         System.assertEquals(2, diffResult.size());
@@ -67,8 +67,8 @@ public class SListApiTest {
         System.assertEquals(contacts[4], diffResult[1]);
 
         // get all contacts that exist in both lists using intersect
-        Contact[] intersectResult = (Contact[])new SListApi(contacts)
-            .intersect(new Contact[] { contacts[0], contacts[1], contacts[2], new Contact(FirstName = 'new') })
+        List<Contact> intersectResult = (List<Contact>)new SListApi(contacts)
+            .intersect(new List<Contact> { contacts[0], contacts[1], contacts[2], new Contact(FirstName = 'new') })
             .toList();
 
         System.assertEquals(3, intersectResult.size());
@@ -77,8 +77,8 @@ public class SListApiTest {
         System.assertEquals(contacts[2], intersectResult[2]);
 
         // join two lists using union
-        Contact[] unionResult = (Contact[])new SListApi(contacts)
-            .union(new Contact[] { contacts[0], contacts[1], contacts[2], new Contact(FirstName = 'new') })
+        List<Contact> unionResult = (List<Contact>)new SListApi(contacts)
+            .union(new List<Contact> { contacts[0], contacts[1], contacts[2], new Contact(FirstName = 'new') })
             .toList();
 
         System.assertEquals(6, unionResult.size());
@@ -92,12 +92,12 @@ public class SListApiTest {
 
     @IsTest
     static void it_should_be_iterable() {
-        Contact[] contacts = buildContactList();
+        List<Contact> contacts = buildContactList();
 
         SListApi myList = new SListApi(contacts);
 
         Iterator<SObject> iterator = myList.iterator();
-        Contact[] all = new Contact[] {};
+        List<Contact> all = new List<Contact> {};
         while (iterator.hasNext()) {
             Contact value = (Contact)iterator.next();
             all.add(value);
@@ -112,7 +112,7 @@ public class SListApiTest {
         List<Contact> contactList = buildContactList();
 
         //when - sort by string field
-        Map<String, Contact[]> groupedList = (Map<String, Contact[]>)SListApi.fromList(contactList).groupByString('LastName');
+        Map<String, List<Contact>> groupedList = (Map<String, List<Contact>>)SListApi.fromList(contactList).groupByString('LastName');
 
         //then data grouped by string field
         System.assertEquals(2, groupedList.get('Test').size());
@@ -124,7 +124,7 @@ public class SListApiTest {
          List<Contact> contactList = buildContactList();
 
          //when - sort by id field
-         Map<Id, Contact[]> groupedList = (Map<Id, Contact[]>)SListApi.fromList(contactList).groupById('AccountId');
+         Map<Id, List<Contact>> groupedList = (Map<Id, List<Contact>>)SListApi.fromList(contactList).groupById('AccountId');
 
          //then data grouped by id field
          for(Id key : groupedList.keySet()) {

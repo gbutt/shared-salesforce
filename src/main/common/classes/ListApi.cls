@@ -1,7 +1,7 @@
 public virtual class ListApi implements Iterable<Object> {
-    Object[] objList;
+    List<Object> objList;
 
-    public static ListApi fromList(Object[] objList) {
+    public static ListApi fromList(List<Object> objList) {
         return new ListApi(objList);
     }
 
@@ -9,7 +9,7 @@ public virtual class ListApi implements Iterable<Object> {
         return new ListApi(objList);
     }
 
-    public ListApi(Object[] objList) {
+    public ListApi(List<Object> objList) {
         this.objList = new List<Object>(objList);
     }
     public ListApi(Set<Object> objSet) {
@@ -17,17 +17,17 @@ public virtual class ListApi implements Iterable<Object> {
     }
 
     public ListApi filter(CollectionUtils.FilterOperator operator, Object filterValue) {
-        objList = CollectionUtils.filter(objList, operator, filterValue, new Object[] {});
+        objList = CollectionUtils.filter(objList, operator, filterValue, new List<Object> {});
         return this;
     }
 
     public ListApi flatten() {
-        objList = CollectionUtils.flatten(objList, new Object[] {});
+        objList = CollectionUtils.flatten(objList, new List<Object> {});
         return this;
     }
 
     public ListApi removeNulls() {
-        objList = CollectionUtils.removeNulls(objList, new Object[] {});
+        objList = CollectionUtils.removeNulls(objList, new List<Object> {});
         return this;
     }
 
@@ -36,38 +36,38 @@ public virtual class ListApi implements Iterable<Object> {
         return this;
     }
 
-    public ListApi difference(Object[] objListB) {
-        objList = CollectionUtils.difference(objList, objListB, new Object[] {});
+    public ListApi difference(List<Object> objListB) {
+        objList = CollectionUtils.difference(objList, objListB, new List<Object> {});
         return this;
     }
 
-    public ListApi intersect(Object[] objListB) {
-        objList = CollectionUtils.intersect(objList, objListB, new Object[] {});
+    public ListApi intersect(List<Object> objListB) {
+        objList = CollectionUtils.intersect(objList, objListB, new List<Object> {});
         return this;
     }
 
-    public ListApi union(Object[] objListB) {
-        objList = CollectionUtils.union(objList, objListB, new Object[] {});
+    public ListApi union(List<Object> objListB) {
+        objList = CollectionUtils.union(objList, objListB, new List<Object> {});
         return this;
     }
 
-    public Object[] toList() {
+    public List<Object> toList() {
         return objList;
     }
 
-    public Object[] toList(Object[] result) {
+    public List<Object> toList(List<Object> result) {
         for (Object obj : objList) {
             result.add(obj);
         }
         return result;
     }
 
-    public Id[] toIdList() {
-        return (Id[])this.toList(new Id[] {});
+    public List<Id> toIdList() {
+        return (List<Id>)this.toList(new List<Id> {});
     }
 
-    public String[] toStringList() {
-        return (String[])this.toList(new String[] {});
+    public List<String> toStringList() {
+        return (List<String>)this.toList(new List<String> {});
     }
 
 
@@ -80,7 +80,7 @@ public virtual class ListApi implements Iterable<Object> {
         objList.add(idx, obj);
     }
 
-    public void addAll(Object[] objs) {
+    public void addAll(List<Object> objs) {
         objList.addAll(objs);
     }
 
@@ -92,11 +92,11 @@ public virtual class ListApi implements Iterable<Object> {
         return objList.contains(obj);
     }
 
-    public Boolean containsAll(Object[] objs) {
+    public Boolean containsAll(List<Object> objs) {
         return new Set<Object>(objList).containsAll(objs);
     }
 
-    public Boolean equals(Object[] objs) {
+    public Boolean equals(List<Object> objs) {
         return objList.equals(objs);
     }
 

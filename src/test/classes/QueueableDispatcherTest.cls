@@ -7,7 +7,7 @@ public class QueueableDispatcherTest {
         QueueableTestHelper.setupTestExecutor();
 
         // given - a queueable and a chain
-        QueueableChain chain = new TestQueueableChain();
+        QueueableChain chain = new QueueableTestHelper.TestQueueableChain();
         TestQueueable task = new TestQueueable();
         chain.enqueue(task);
 
@@ -16,7 +16,7 @@ public class QueueableDispatcherTest {
 
         // then - the chain is intercepted and stored in a list for inspection
         // basically every call that would call System.enqueueJob will instead be added the the enqueuedChains static property
-        QueueableChain[] enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
+        List<QueueableChain> enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
         System.assertEquals(1, enqueuedChains.size());
         System.assertEquals(chain, enqueuedChains[0]);
         System.assertEquals(task, enqueuedChains[0].queueableStack[0]);
@@ -28,10 +28,10 @@ public class QueueableDispatcherTest {
         QueueableTestHelper.setupTestExecutor();
 
         // given - two chains
-		QueueableChain chain1 = new TestQueueableChain();
+		QueueableChain chain1 = new QueueableTestHelper.TestQueueableChain();
 		TestQueueable task1 = new TestQueueable();
         chain1.enqueue(task1);
-		QueueableChain chain2 = new TestQueueableChain();
+		QueueableChain chain2 = new QueueableTestHelper.TestQueueableChain();
 		TestQueueable task2 = new TestQueueable();
         chain2.enqueue(task2);
 
@@ -42,13 +42,11 @@ public class QueueableDispatcherTest {
 		QueueableDispatcher.enqueueChain(chain2);
 
 		// then - chain2 is pushed onto chain1
-		QueueableChain[] enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
+		List<QueueableChain> enqueuedChains = QueueableTestHelper.executor.enqueuedChains;
         System.assertEquals(0, enqueuedChains.size());
 		System.assertEquals(task2, QueueableDispatcher.currentlyExecutingChain.queueableStack[0]);
 		System.assertEquals(task1, QueueableDispatcher.currentlyExecutingChain.queueableStack[1]);
 	}
-
-	public class TestQueueableChain extends QueueableChain {}
 
     public class TestQueueable implements Queueable {
         public Boolean hasExecuted {get;set;}

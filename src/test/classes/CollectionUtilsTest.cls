@@ -5,39 +5,43 @@ public class CollectionUtilsTest {
     @IsTest
     static void example_pluck_account_ids_for_query() {
         // build ten contacts
-        Contact[] contacts = new Contact[10];
+        List<Contact> contacts = new List<Contact>(10);
         for (Integer idx = 0; idx < contacts.size(); idx++) {
             contacts[idx] = new Contact(
-                Id = IdUtils.id(idx, Contact.SObjectType)
-                , FirstName = String.valueOf(idx)
-                , LastName = 'Test'
-                , AccountId = IdUtils.id(idx, Account.SObjectType)
+                Id = IdUtils.id(idx, Contact.SObjectType),
+                FirstName = String.valueOf(idx),
+                LastName = 'Test',
+                AccountId = IdUtils.id(idx, Account.SObjectType)
             );
         }
 
         // pluck the Account Ids
-        Id[] accountIds = (Id[])CollectionUtils.pluck(contacts, 'AccountId', new Id[] {});
+        List<Id> accountIds = (List<Id>) CollectionUtils.pluck(contacts, 'AccountId', new List<Id>{});
         System.assertEquals(10, accountIds.size());
-        Account[] accounts = [SELECT Id FROM Account WHERE Id IN :accountIds];
+        List<Account> accounts = [SELECT Id FROM Account WHERE Id IN :accountIds];
     }
 
     @IsTest
     static void example_split_contacts_by_lastname_version_1() {
-        Contact[] contacts = new Contact[] {
-            new Contact(FirstName = '0', LastName = 'Test', Email = 'test')
-            , new Contact(FirstName = '1', LastName = 'Test', Email = 'test')
-            , new Contact(FirstName = '2', LastName = 'Test2', Email = 'test')
-            , new Contact(FirstName = '3', LastName = 'Test2', Email = 'test')
-            , new Contact(FirstName = '4', LastName = 'Test3', Email = 'test')
+        List<Contact> contacts = new List<Contact>{
+            new Contact(FirstName = '0', LastName = 'Test', Email = 'test'),
+            new Contact(FirstName = '1', LastName = 'Test', Email = 'test'),
+            new Contact(FirstName = '2', LastName = 'Test2', Email = 'test'),
+            new Contact(FirstName = '3', LastName = 'Test2', Email = 'test'),
+            new Contact(FirstName = '4', LastName = 'Test3', Email = 'test')
         };
 
         // split all contacts with lastname = Test and lastname != Test
         // 1. group by LastName
-        Map<Object, SObject[]> groupedByLastName = CollectionUtils.groupBy(contacts, 'LastName');
+        Map<Object, List<SObject>> groupedByLastName = CollectionUtils.groupBy(contacts, 'LastName');
         // 2, get contacts with LastName = 'Test'
-        Contact[] testContacts = (Contact[])groupedByLastName.get('Test');
+        List<Contact> testContacts = (List<Contact>) groupedByLastName.get('Test');
         // 3. get all contacts not in the testContacts list
-        Contact[] notTestContacts = (Contact[])CollectionUtils.difference(contacts, testContacts, new Contact[] {});
+        List<Contact> notTestContacts = (List<Contact>) CollectionUtils.difference(
+            contacts,
+            testContacts,
+            new List<Contact>{}
+        );
 
         // all contacts have LastName = Test
         System.assertEquals(2, testContacts.size());
@@ -45,7 +49,11 @@ public class CollectionUtilsTest {
             System.assertEquals('Test', c.LastName);
         }
         // all contacts have LastName != Test
-        System.assertEquals(contacts.size() - testContacts.size(), notTestContacts.size(), notTestContacts);
+        System.assertEquals(
+            contacts.size() - testContacts.size(),
+            notTestContacts.size(),
+            notTestContacts
+        );
         for (Contact c : notTestContacts) {
             System.assertNotEquals('Test', c.LastName);
         }
@@ -53,21 +61,24 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void example_split_contacts_by_lastname_version_2() {
-        Contact[] contacts = new Contact[] {
-            new Contact(FirstName = '0', LastName = 'Test', Email = 'test')
-            , new Contact(FirstName = '1', LastName = 'Test', Email = 'test')
-            , new Contact(FirstName = '2', LastName = 'Test2', Email = 'test')
-            , new Contact(FirstName = '3', LastName = 'Test2', Email = 'test')
-            , new Contact(FirstName = '4', LastName = 'Test3', Email = 'test')
+        List<Contact> contacts = new List<Contact>{
+            new Contact(FirstName = '0', LastName = 'Test', Email = 'test'),
+            new Contact(FirstName = '1', LastName = 'Test', Email = 'test'),
+            new Contact(FirstName = '2', LastName = 'Test2', Email = 'test'),
+            new Contact(FirstName = '3', LastName = 'Test2', Email = 'test'),
+            new Contact(FirstName = '4', LastName = 'Test3', Email = 'test')
         };
 
         // another way to split all contacts with lastname = Test and lastname != Test
         // 1. group by LastName
-        Map<Object, SObject[]> groupedByLastName = CollectionUtils.groupBy(contacts, 'LastName');
+        Map<Object, List<SObject>> groupedByLastName = CollectionUtils.groupBy(contacts, 'LastName');
         // 2. remove 'Test' entry from the map
-        Contact[] testContacts = (Contact[])groupedByLastName.remove('Test');
+        List<Contact> testContacts = (List<Contact>) groupedByLastName.remove('Test');
         // 3. flatten the remaining values into a list
-        Contact[] notTestContacts = (Contact[])CollectionUtils.flatten(groupedByLastName.values(), new Contact[] {});
+        List<Contact> notTestContacts = (List<Contact>) CollectionUtils.flatten(
+            groupedByLastName.values(),
+            new List<Contact>{}
+        );
 
         // all contacts have LastName = Test
         System.assertEquals(2, testContacts.size());
@@ -76,7 +87,11 @@ public class CollectionUtilsTest {
         }
 
         // all contacts have LastName != Test
-        System.assertEquals(contacts.size() - testContacts.size(), notTestContacts.size(), notTestContacts);
+        System.assertEquals(
+            contacts.size() - testContacts.size(),
+            notTestContacts.size(),
+            notTestContacts
+        );
         for (Contact c : notTestContacts) {
             System.assertNotEquals('Test', c.LastName);
         }
@@ -85,16 +100,21 @@ public class CollectionUtilsTest {
     @IsTest
     static void example_filter_contacts_by_date() {
         // 10 contacts with birthdays between jan 1 and jan 10
-        Contact[] contacts = new Contact[10];
+        List<Contact> contacts = new List<Contact>(10);
         for (Integer idx = 0; idx < contacts.size(); idx++) {
             contacts[idx] = new Contact(
-                Id = IdUtils.id(idx, Contact.SObjectType)
-                , BirthDate = Date.newInstance(2000, 1, idx + 1)
+                Id = IdUtils.id(idx, Contact.SObjectType),
+                BirthDate = Date.newInstance(2000, 1, idx + 1)
             );
         }
 
         Date filterDate = Date.newInstance(2000, 1, 5);
-        Contact[] result = (Contact[])CollectionUtils.filter(contacts, 'BirthDate', CollectionUtils.FilterOperator.GREATER_THAN, filterDate);
+        List<Contact> result = (List<Contact>) CollectionUtils.filter(
+            contacts,
+            'BirthDate',
+            CollectionUtils.FilterOperator.GREATER_THAN,
+            filterDate
+        );
         System.assertEquals(5, result.size());
         for (Contact c : result) {
             System.assertEquals(true, c.BirthDate > filterDate);
@@ -106,7 +126,7 @@ public class CollectionUtilsTest {
     @IsTest
     static void groupBy_should_group_sobjects_by_field() {
         // given
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(LastName = 'Test'),
             new Contact(LastName = 'Test'),
             new Contact(LastName = 'Test2'),
@@ -116,14 +136,17 @@ public class CollectionUtilsTest {
         };
 
         // when
-        Map<Object, Contact[]> result = (Map<Object, Contact[]>)CollectionUtils.groupBy(contacts, 'LastName');
+        Map<Object, List<Contact>> result = (Map<Object, List<Contact>>) CollectionUtils.groupBy(
+            contacts,
+            'LastName'
+        );
 
         // then - 4 grouped entries
         System.assertEquals(4, result.size(), result);
 
         // 2 for Test
         System.assertEquals(2, result.get('Test').size());
-        Contact[] testContacts = result.get('Test');
+        List<Contact> testContacts = result.get('Test');
         for (Contact c : testContacts) {
             System.assertEquals('Test', c.LastName);
         }
@@ -145,7 +168,7 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void groupBy_should_group_queried_sobjects_by_field() {
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(LastName = 'Test', FirstName = 'Test'),
             new Contact(LastName = 'Test', FirstName = 'Test'),
             new Contact(LastName = 'Test', FirstName = 'Test2'),
@@ -157,14 +180,17 @@ public class CollectionUtilsTest {
         contacts = [SELECT FirstName FROM Contact];
 
         // when
-        Map<Object, Contact[]> result = (Map<Object, Contact[]>)CollectionUtils.groupBy(contacts, 'FirstName');
+        Map<Object, List<Contact>> result = (Map<Object, List<Contact>>) CollectionUtils.groupBy(
+            contacts,
+            'FirstName'
+        );
 
         // then - 4 grouped entries
         System.assertEquals(4, result.size(), result);
 
         // 2 for Test
         System.assertEquals(2, result.get('Test').size());
-        Contact[] testContacts = result.get('Test');
+        List<Contact> testContacts = result.get('Test');
         for (Contact c : testContacts) {
             System.assertEquals('Test', c.FirstName);
         }
@@ -188,7 +214,7 @@ public class CollectionUtilsTest {
     static void groupBy_should_group_sobjects_by_sobject_field() {
         // given
         Id testAccountId = IdUtils.newId(Account.SObjectType);
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(LastName = '0', Account = new Account(Id = testAccountId)),
             new Contact(LastName = '1', Account = new Account(Id = testAccountId)),
             new Contact(LastName = '2', Account = new Account(Id = testAccountId, Name = 'Test2')),
@@ -200,20 +226,24 @@ public class CollectionUtilsTest {
         };
 
         // test sobject equality
-        System.assertEquals(contacts[0].Account, contacts[1].Account);  // same id
-        System.assertNotEquals(contacts[0].Account, contacts[2].Account);  // same id but different names
-        System.assertNotEquals(contacts[2].Account, contacts[3].Account);  // same name but different ids
-        System.assertNotEquals(contacts[5].Account, contacts[6].Account);  // new account != null
-        System.assertEquals(contacts[6].Account, contacts[7].Account);  // both null
+        System.assertEquals(contacts[0].Account, contacts[1].Account); // same id
+        System.assertNotEquals(contacts[0].Account, contacts[2].Account); // same id but different names
+        System.assertNotEquals(contacts[2].Account, contacts[3].Account); // same name but different ids
+        System.assertNotEquals(contacts[5].Account, contacts[6].Account); // new account != null
+        System.assertEquals(contacts[6].Account, contacts[7].Account); // both null
 
         // when
-        Map<Object, Contact[]> result = (Map<Object, Contact[]>)CollectionUtils.groupBy(contacts, 'Account', true);
+        Map<Object, List<Contact>> result = (Map<Object, List<Contact>>) CollectionUtils.groupBy(
+            contacts,
+            'Account',
+            true
+        );
 
         // then - 6 grouped entries
         System.assertEquals(6, result.size(), result);
 
         // 2 for testAccountId
-        Contact[] values = result.get(new Account(Id = testAccountId));
+        List<Contact> values = result.get(new Account(Id = testAccountId));
         System.assertEquals(2, values.size(), values);
         // 1 for Test2
         values = result.get(new Account(Name = 'Test2'));
@@ -234,14 +264,14 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void groupBy_should_group_queried_sobjects_by_sobject_field() {
-        Account[] accounts = new Account[] {
-            new Account(Name = 'Test0')
-            , new Account(Name = 'Test0')
-            , new Account(Name = 'Test1')
-            , new Account(Name = 'Test2')
+        List<Account> accounts = new List<Account>{
+            new Account(Name = 'Test0'),
+            new Account(Name = 'Test0'),
+            new Account(Name = 'Test1'),
+            new Account(Name = 'Test2')
         };
         insert accounts;
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(LastName = '0', AccountId = accounts[0].Id),
             new Contact(LastName = '1', AccountId = accounts[0].Id),
             new Contact(LastName = '2', AccountId = accounts[1].Id),
@@ -254,19 +284,23 @@ public class CollectionUtilsTest {
         contacts = [SELECT Account.Name FROM Contact];
 
         // test sobject equality
-        System.assertEquals(contacts[0].Account, contacts[1].Account);  // same account
-        System.assertNotEquals(contacts[1].Account, contacts[2].Account);  // different accounts with same name
-        System.assertNotEquals(contacts[2].Account, contacts[3].Account);  // different accounts with different name
-        System.assertEquals(contacts[5].Account, contacts[6].Account);  // both null
+        System.assertEquals(contacts[0].Account, contacts[1].Account); // same account
+        System.assertNotEquals(contacts[1].Account, contacts[2].Account); // different accounts with same name
+        System.assertNotEquals(contacts[2].Account, contacts[3].Account); // different accounts with different name
+        System.assertEquals(contacts[5].Account, contacts[6].Account); // both null
 
         // when
-        Map<Object, Contact[]> result = (Map<Object, Contact[]>)CollectionUtils.groupBy(contacts, 'Account', true);
+        Map<Object, List<Contact>> result = (Map<Object, List<Contact>>) CollectionUtils.groupBy(
+            contacts,
+            'Account',
+            true
+        );
 
         // then - 5 grouped entries
         System.assertEquals(5, result.size(), result);
 
         // 2 for Test0
-        Contact[] values = result.get(contacts[0].Account);
+        List<Contact> values = result.get(contacts[0].Account);
         System.assertEquals(2, values.size(), values);
         // 1 for the other account named Test0
         values = result.get(contacts[2].Account);
@@ -285,7 +319,7 @@ public class CollectionUtilsTest {
     @IsTest
     static void groupBy_should_group_sobjects_by_parent_field() {
         // given
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(Account = new Account(Name = 'Test')),
             new Contact(Account = new Account(Name = 'Test')),
             new Contact(Account = new Account(Name = 'Test2')),
@@ -296,13 +330,16 @@ public class CollectionUtilsTest {
         };
 
         // when
-        Map<Object, Contact[]> result = (Map<Object, Contact[]>)CollectionUtils.groupBy(contacts, 'Account.Name');
+        Map<Object, List<Contact>> result = (Map<Object, List<Contact>>) CollectionUtils.groupBy(
+            contacts,
+            'Account.Name'
+        );
 
         // then - 4 grouped entries
         System.assertEquals(4, result.size(), result);
         // 2 for Test
         System.assertEquals(2, result.get('Test').size());
-        Contact[] testContacts = result.get('Test');
+        List<Contact> testContacts = result.get('Test');
         for (Contact c : testContacts) {
             System.assertEquals('Test', c.Account.Name);
         }
@@ -324,13 +361,13 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void groupBy_should_group_queried_sobjects_by_parent_field() {
-        Account[] accounts = new Account[] {
-            new Account(Name = 'Test0')
-            , new Account(Name = 'Test1')
-            , new Account(Name = 'Test2')
+        List<Account> accounts = new List<Account>{
+            new Account(Name = 'Test0'),
+            new Account(Name = 'Test1'),
+            new Account(Name = 'Test2')
         };
         insert accounts;
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(LastName = 'Test', AccountId = accounts[0].Id),
             new Contact(LastName = 'Test', AccountId = accounts[0].Id),
             new Contact(LastName = 'Test', AccountId = accounts[1].Id),
@@ -342,13 +379,16 @@ public class CollectionUtilsTest {
         contacts = [SELECT Account.Name FROM Contact];
 
         // when
-        Map<Object, Contact[]> result = (Map<Object, Contact[]>)CollectionUtils.groupBy(contacts, 'Account.Name');
+        Map<Object, List<Contact>> result = (Map<Object, List<Contact>>) CollectionUtils.groupBy(
+            contacts,
+            'Account.Name'
+        );
 
         // then - 4 grouped entries
         System.assertEquals(4, result.size(), result);
         // 2 for Test0
         System.assertEquals(2, result.get('Test0').size());
-        Contact[] testContacts = result.get('Test0');
+        List<Contact> testContacts = result.get('Test0');
         for (Contact c : testContacts) {
             System.assertEquals('Test0', c.Account.Name);
         }
@@ -363,7 +403,7 @@ public class CollectionUtilsTest {
     @IsTest
     static void groupBy_should_group_sobjects_by_grandparent_field() {
         // given
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(Account = new Account(Parent = new Account(Name = 'Test'))),
             new Contact(Account = new Account(Parent = new Account(Name = 'Test'))),
             new Contact(Account = new Account(Parent = new Account(Name = 'Test2'))),
@@ -375,13 +415,16 @@ public class CollectionUtilsTest {
         };
 
         // when
-        Map<Object, Contact[]> result = (Map<Object, Contact[]>)CollectionUtils.groupBy(contacts, 'Account.Parent.Name');
+        Map<Object, List<Contact>> result = (Map<Object, List<Contact>>) CollectionUtils.groupBy(
+            contacts,
+            'Account.Parent.Name'
+        );
 
         // then - 4 grouped entries
         System.assertEquals(4, result.size(), result);
         // 2 for Test
         System.assertEquals(2, result.get('Test').size());
-        Contact[] testContacts = result.get('Test');
+        List<Contact> testContacts = result.get('Test');
         for (Contact c : testContacts) {
             System.assertEquals('Test', c.Account.Parent.Name);
         }
@@ -404,7 +447,7 @@ public class CollectionUtilsTest {
     @IsTest
     static void filter_should_filter_sobjects_by_string_field() {
         // given
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(FirstName = '0', LastName = 'Test'),
             new Contact(FirstName = '1', LastName = 'Test'),
             new Contact(FirstName = '2', LastName = 'Test2'),
@@ -412,7 +455,12 @@ public class CollectionUtilsTest {
         };
 
         // when
-        Contact[] result = (Contact[])CollectionUtils.filter(contacts, 'LastName', CollectionUtils.FilterOperator.EQUALS, 'Test');
+        List<Contact> result = (List<Contact>) CollectionUtils.filter(
+            contacts,
+            'LastName',
+            CollectionUtils.FilterOperator.EQUALS,
+            'Test'
+        );
 
         // then
         System.assertEquals(2, result.size());
@@ -425,16 +473,34 @@ public class CollectionUtilsTest {
     static void filter_should_filter_sobjects_by_sobject_field() {
         // given
         Account accountToFind = new Account(Id = IdUtils.id(1, Account.SObjectType));
-        Contact[] contacts = new Contact[] {
-            new Contact(FirstName = 'FindMe', Account = new Account(Id = IdUtils.id(1, Account.SObjectType)))
-            , new Contact(FirstName = 'FindMeNot', Account = new Account(Id = IdUtils.id(0, Account.SObjectType)))
-            , new Contact(FirstName = 'FindMeNot', Account = new Account(Id = IdUtils.id(1, Account.SObjectType), Name = 'Test'))
-            , new Contact(FirstName = 'FindMeNot', Account = new Account())
-            , new Contact(FirstName = 'FindMe', Account = new Account(Id = IdUtils.id(1, Account.SObjectType)))
+        List<Contact> contacts = new List<Contact>{
+            new Contact(
+                FirstName = 'FindMe',
+                Account = new Account(Id = IdUtils.id(1, Account.SObjectType))
+            ),
+            new Contact(
+                FirstName = 'FindMeNot',
+                Account = new Account(Id = IdUtils.id(0, Account.SObjectType))
+            ),
+            new Contact(
+                FirstName = 'FindMeNot',
+                Account = new Account(Id = IdUtils.id(1, Account.SObjectType), Name = 'Test')
+            ),
+            new Contact(FirstName = 'FindMeNot', Account = new Account()),
+            new Contact(
+                FirstName = 'FindMe',
+                Account = new Account(Id = IdUtils.id(1, Account.SObjectType))
+            )
         };
 
         // when
-        Contact[] result = (Contact[])CollectionUtils.filter(contacts, 'Account', CollectionUtils.FilterOperator.EQUALS, accountToFind, true);
+        List<Contact> result = (List<Contact>) CollectionUtils.filter(
+            contacts,
+            'Account',
+            CollectionUtils.FilterOperator.EQUALS,
+            accountToFind,
+            true
+        );
 
         // then
         System.assertEquals(2, result.size());
@@ -447,44 +513,57 @@ public class CollectionUtilsTest {
     @IsTest
     static void filter_should_filter_integers() {
         // given
-        Integer[] ints = new Integer[] {1, 2, 3, 4, 5};
+        List<Integer> ints = new List<Integer>{ 1, 2, 3, 4, 5 };
 
         // when
-        Integer[] result = (Integer[])CollectionUtils.filter(ints, CollectionUtils.FilterOperator.GREATER_THAN, 3, new Integer[] {});
+        List<Integer> result = (List<Integer>) CollectionUtils.filter(
+            ints,
+            CollectionUtils.FilterOperator.GREATER_THAN,
+            3,
+            new List<Integer>{}
+        );
 
         // then
         System.assertEquals(2, result.size());
-        System.assertEquals(new Integer[] {4, 5}, result);
+        System.assertEquals(new List<Integer>{ 4, 5 }, result);
     }
 
     @IsTest
     static void filter_should_convert_to_integer_list() {
         // given
-        Integer[] ints = new Integer[] {1, 2, 3, 4, 5};
+        List<Integer> ints = new List<Integer>{ 1, 2, 3, 4, 5 };
 
         // when
-        Integer[] result = (Integer[])CollectionUtils.filter(ints, CollectionUtils.FilterOperator.GREATER_THAN, 3);
+        List<Integer> result = (List<Integer>) CollectionUtils.filter(
+            ints,
+            CollectionUtils.FilterOperator.GREATER_THAN,
+            3
+        );
 
         // then
         System.assertEquals(2, result.size());
-        System.assertEquals(new Integer[] {4, 5}, result);
+        System.assertEquals(new List<Integer>{ 4, 5 }, result);
     }
 
     @IsTest
     static void pluck_should_pluck_values_from_sobjects() {
-        Contact[] contacts = new Contact[] {
-            new Contact(FirstName = '0', LastName = 'Test')
-            , new Contact(FirstName = '1', LastName = 'Test')
-            , new Contact(FirstName = '2', LastName = 'Test2')
-            , new Contact(FirstName = '3', LastName = 'Test3')
+        List<Contact> contacts = new List<Contact>{
+            new Contact(FirstName = '0', LastName = 'Test'),
+            new Contact(FirstName = '1', LastName = 'Test'),
+            new Contact(FirstName = '2', LastName = 'Test2'),
+            new Contact(FirstName = '3', LastName = 'Test3')
         };
 
         // when
-        String[] result = (String[])CollectionUtils.pluck(contacts, 'FirstName', new String[] {});
+        List<String> result = (List<String>) CollectionUtils.pluck(
+            contacts,
+            'FirstName',
+            new List<String>{}
+        );
 
         // then
         System.assertEquals(contacts.size(), result.size());
-        System.assertEquals(new String[] {'0', '1', '2', '3'}, result);
+        System.assertEquals(new List<String>{ '0', '1', '2', '3' }, result);
         // order is preserved
         for (Integer idx = 0; idx < result.size(); idx++) {
             Contact c = contacts.get(idx);
@@ -495,83 +574,78 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void flatten_should_flatten_nested_lists() {
-        Object[] objList = new Object[] {
-            1, 2
-            , new Object[] {
-                3, 4
-                , new Object[] {5, 6}
-            }
-            , 7
-            , new Object[] {
-                8, 9
-            }
+        List<Object> objList = new List<Object>{
+            1,
+            2,
+            new List<Object>{ 3, 4, new List<Object>{ 5, 6 } },
+            7,
+            new List<Object>{ 8, 9 }
         };
 
         // when
-        Integer[] result = (Integer[])CollectionUtils.flatten(objList, new Integer[] {});
+        List<Integer> result = (List<Integer>) CollectionUtils.flatten(objList, new List<Integer>{});
 
         // then
-        System.assertEquals(new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9}, result);
+        System.assertEquals(new List<Integer>{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, result);
     }
 
     @IsTest
     static void difference_should_fill_provided_list() {
-        Integer[] listA = new Integer[] {1, 2, 3};
-        Integer[] listB = new Integer[] {3, 4, 5};
+        List<Integer> listA = new List<Integer>{ 1, 2, 3 };
+        List<Integer> listB = new List<Integer>{ 3, 4, 5 };
 
         // when
-        Integer[] result = (Integer[])CollectionUtils.difference(listA, listB, new Integer[] {});
+        List<Integer> result = (List<Integer>) CollectionUtils.difference(
+            listA,
+            listB,
+            new List<Integer>{}
+        );
 
         // then
-        System.assertEquals(new Integer[] {1, 2}, result);
+        System.assertEquals(new List<Integer>{ 1, 2 }, result);
     }
 
     @IsTest
     static void intersect_should_fill_provided_list() {
-        Integer[] listA = new Integer[] {1, 2, 3};
-        Integer[] listB = new Integer[] {3, 4, 5};
+        List<Integer> listA = new List<Integer>{ 1, 2, 3 };
+        List<Integer> listB = new List<Integer>{ 3, 4, 5 };
 
         // when
-        Integer[] result = (Integer[])CollectionUtils.intersect(listA, listB, new Integer[] {});
+        List<Integer> result = (List<Integer>) CollectionUtils.intersect(listA, listB, new List<Integer>{});
 
         // then
-        System.assertEquals(new Integer[] {3}, result);
+        System.assertEquals(new List<Integer>{ 3 }, result);
     }
 
     @IsTest
     static void union_should_fill_provided_list() {
-        Integer[] listA = new Integer[] {1, 2, 3};
-        Integer[] listB = new Integer[] {3, 4, 5};
+        List<Integer> listA = new List<Integer>{ 1, 2, 3 };
+        List<Integer> listB = new List<Integer>{ 3, 4, 5 };
 
         // when
-        Integer[] result = (Integer[])CollectionUtils.union(listA, listB, new Integer[] {});
+        List<Integer> result = (List<Integer>) CollectionUtils.union(listA, listB, new List<Integer>{});
 
         // then
-        System.assertEquals(new Integer[] {1, 2, 3, 4, 5}, result);
+        System.assertEquals(new List<Integer>{ 1, 2, 3, 4, 5 }, result);
     }
 
     @IsTest
     static void removeNulls_should_remove_null_entries_from_list() {
-        Integer[] objList = new Integer[] {
-            null
-            , 1
-            , null
-            , 2
-        };
+        List<Integer> objList = new List<Integer>{ null, 1, null, 2 };
         System.assertEquals(4, objList.size());
 
-        Integer[] result = (Integer[])CollectionUtils.removeNulls(objList, new Integer[] {});
+        List<Integer> result = (List<Integer>) CollectionUtils.removeNulls(objList, new List<Integer>{});
         System.assertEquals(2, result.size());
         for (Integer i : result) {
             System.assertNotEquals(null, i);
         }
-        System.assertEquals(new Integer[] {1, 2}, result);
+        System.assertEquals(new List<Integer>{ 1, 2 }, result);
     }
 
     @IsTest
     static void removeNulls_should_filter_sobjects_where_field_is_null() {
         // given
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(LastName = 'Test'),
             new Contact(LastName = 'Test'),
             new Contact(LastName = 'Test2'),
@@ -581,7 +655,7 @@ public class CollectionUtilsTest {
         };
 
         // when
-        Contact[] result = (Contact[])CollectionUtils.removeNulls(contacts, 'LastName');
+        List<Contact> result = (List<Contact>) CollectionUtils.removeNulls(contacts, 'LastName');
 
         // then
         System.assertEquals(4, result.size());
@@ -593,7 +667,7 @@ public class CollectionUtilsTest {
     @IsTest
     static void removeNulls_should_filter_sobjects_where_sobject_field_is_null() {
         // given
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(Account = new Account(Name = 'Test')),
             new Contact(Account = new Account(Name = 'Test')),
             new Contact(Account = new Account(Name = 'Test2')),
@@ -603,7 +677,7 @@ public class CollectionUtilsTest {
         };
 
         // when
-        Contact[] result = (Contact[])CollectionUtils.removeNulls(contacts, 'Account', true);
+        List<Contact> result = (List<Contact>) CollectionUtils.removeNulls(contacts, 'Account', true);
 
         // then
         System.assertEquals(5, result.size());
@@ -615,7 +689,7 @@ public class CollectionUtilsTest {
     @IsTest
     static void removeNulls_should_filter_sobjects_where_grandparent_field_is_null() {
         // given
-        Contact[] contacts = new Contact[] {
+        List<Contact> contacts = new List<Contact>{
             new Contact(Account = new Account(Parent = new Account(Name = 'Test'))),
             new Contact(Account = new Account(Parent = new Account(Name = 'Test'))),
             new Contact(Account = new Account(Parent = new Account(Name = 'Test2'))),
@@ -627,7 +701,7 @@ public class CollectionUtilsTest {
         };
 
         // when
-        Contact[] result = (Contact[])CollectionUtils.removeNulls(contacts, 'Account.Parent.Name');
+        List<Contact> result = (List<Contact>) CollectionUtils.removeNulls(contacts, 'Account.Parent.Name');
 
         // then
         System.assertEquals(4, result.size());
@@ -641,14 +715,10 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toSObjectList_should_convert_objects_to_sobjects() {
-        Object[] objList = new Object[] {
-            new Account(),
-            new Account(),
-            null
-        };
+        List<Object> objList = new List<Object>{ new Account(), new Account(), null };
 
         // when
-        Account[] result = (Account[])CollectionUtils.toSObjectList(objList);
+        List<Account> result = (List<Account>) CollectionUtils.toSObjectList(objList);
 
         // then
         System.assertEquals(3, result.size());
@@ -656,14 +726,10 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toStringList_should_convert_objects_to_Strings() {
-        Object[] objList = new Object[] {
-            'test',
-            'test2',
-            null
-        };
+        List<Object> objList = new List<Object>{ 'test', 'test2', null };
 
         // when
-        String[] result = CollectionUtils.toStringList(objList);
+        List<String> result = CollectionUtils.toStringList(objList);
 
         // then
         System.assertEquals(3, result.size());
@@ -671,14 +737,14 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toIdList_should_convert_objects_to_Ids() {
-        Object[] objList = new Object[] {
+        List<Object> objList = new List<Object>{
             IdUtils.newId(Account.SObjectType),
             IdUtils.newId(Account.SObjectType),
             null
         };
 
         // when
-        Id[] result = CollectionUtils.toIdList(objList);
+        List<Id> result = CollectionUtils.toIdList(objList);
 
         // then
         System.assertEquals(3, result.size());
@@ -686,16 +752,10 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toIntegerList_should_convert_objects_to_Integers() {
-        Object[] objList = new Object[] {
-            1.0,
-            '2.0',
-            3,
-            4l,
-            null
-        };
+        List<Object> objList = new List<Object>{ 1.0, '2.0', 3, 4L, null };
 
         // when
-        Integer[] result = CollectionUtils.toIntegerList(objList);
+        List<Integer> result = CollectionUtils.toIntegerList(objList);
 
         // then
         System.assertEquals(5, result.size());
@@ -703,16 +763,10 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toLongList_should_convert_objects_to_Longs() {
-        Object[] objList = new Object[] {
-            1.0,
-            '2.0',
-            3,
-            4l,
-            null
-        };
+        List<Object> objList = new List<Object>{ 1.0, '2.0', 3, 4L, null };
 
         // when
-        Long[] result = CollectionUtils.toLongList(objList);
+        List<Long> result = CollectionUtils.toLongList(objList);
 
         // then
         System.assertEquals(5, result.size());
@@ -720,16 +774,10 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toDoubleList_should_convert_objects_to_Doubles() {
-        Object[] objList = new Object[] {
-            1.0,
-            '2.0',
-            3,
-            4l,
-            null
-        };
+        List<Object> objList = new List<Object>{ 1.0, '2.0', 3, 4L, null };
 
         // when
-        Double[] result = CollectionUtils.toDoubleList(objList);
+        List<Double> result = CollectionUtils.toDoubleList(objList);
 
         // then
         System.assertEquals(5, result.size());
@@ -737,16 +785,10 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toDecimalList_should_convert_objects_to_Decimals() {
-        Object[] objList = new Object[] {
-            1.0,
-            '2.0',
-            3,
-            4l,
-            null
-        };
+        List<Object> objList = new List<Object>{ 1.0, '2.0', 3, 4L, null };
 
         // when
-        Decimal[] result = CollectionUtils.toDecimalList(objList);
+        List<Decimal> result = CollectionUtils.toDecimalList(objList);
 
         // then
         System.assertEquals(5, result.size());
@@ -754,14 +796,10 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toBooleanList_should_convert_objects_to_Booleans() {
-        Object[] objList = new Object[] {
-            true,
-            'false',
-            null
-        };
+        List<Object> objList = new List<Object>{ true, 'false', null };
 
         // when
-        Boolean[] result = CollectionUtils.toBooleanList(objList);
+        List<Boolean> result = CollectionUtils.toBooleanList(objList);
 
         // then
         System.assertEquals(3, result.size());
@@ -769,7 +807,7 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toDateList_should_convert_objects_to_Dates() {
-        Object[] objList = new Object[] {
+        List<Object> objList = new List<Object>{
             Date.newInstance(2017, 1, 2),
             Datetime.newInstanceGmt(2017, 1, 2),
             '2017-01-02',
@@ -779,7 +817,7 @@ public class CollectionUtilsTest {
         };
 
         // when
-        Date[] result = CollectionUtils.toDateList(objList);
+        List<Date> result = CollectionUtils.toDateList(objList);
 
         // then
         System.assertEquals(6, result.size());
@@ -792,8 +830,8 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toDateTimeList_should_convert_objects_to_DateTimes() {
-        Object[] objList = new Object[] {
-            Date.newInstance(2017, 1, 2),  // local timezone
+        List<Object> objList = new List<Object>{
+            Date.newInstance(2017, 1, 2), // local timezone
             Datetime.newInstanceGmt(2017, 1, 2),
             // '2017-01-01',
             '2017-01-01 00:00:00.000Z',
@@ -801,7 +839,7 @@ public class CollectionUtilsTest {
         };
 
         // when
-        DateTime[] result = CollectionUtils.toDateTimeList(objList);
+        List<Datetime> result = CollectionUtils.toDateTimeList(objList);
 
         // then
         System.assertEquals(4, result.size());
@@ -809,13 +847,10 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toTimeList_should_convert_objects_to_Times() {
-        Object[] objList = new Object[] {
-            Time.newInstance(0, 0, 0, 0),
-            null
-        };
+        List<Object> objList = new List<Object>{ Time.newInstance(0, 0, 0, 0), null };
 
         // when
-        Time[] result = CollectionUtils.toTimeList(objList);
+        List<Time> result = CollectionUtils.toTimeList(objList);
 
         // then
         System.assertEquals(2, result.size());
@@ -823,14 +858,10 @@ public class CollectionUtilsTest {
 
     @IsTest
     static void toBlobList_should_convert_objects_to_Blobs() {
-        Object[] objList = new Object[] {
-            Blob.valueOf('test')
-            , 'test'
-            , null
-        };
+        List<Object> objList = new List<Object>{ Blob.valueOf('test'), 'test', null };
 
         // when
-        Blob[] result = CollectionUtils.toBlobList(objList);
+        List<Blob> result = CollectionUtils.toBlobList(objList);
 
         // then
         System.assertEquals(3, result.size());
@@ -850,11 +881,11 @@ public class CollectionUtilsTest {
         System.assertEquals('Datetime', CollectionUtils.getType(DateTime.now()));
         System.assertEquals('Time', CollectionUtils.getType(Time.newInstance(0, 0, 0, 0)));
         System.assertEquals('Integer', CollectionUtils.getType(1));
-        System.assertEquals('Long', CollectionUtils.getType(1l));
+        System.assertEquals('Long', CollectionUtils.getType(1L));
         System.assertEquals('Decimal', CollectionUtils.getType(1.0));
         // System.assertEquals('Double', CollectionUtils.getType(Double.valueOf(1)));
-        System.assertEquals('List', CollectionUtils.getType(new Integer[] {}));
-        System.assertEquals('List', CollectionUtils.getType(new Account[] {}));
+        System.assertEquals('List', CollectionUtils.getType(new List<Integer>{}));
+        System.assertEquals('List', CollectionUtils.getType(new List<Account>{}));
         System.assertEquals('Object', CollectionUtils.getType(new Set<String>()));
         System.assertEquals('Object', CollectionUtils.getType(new Set<Account>()));
         System.assertEquals('Object', CollectionUtils.getType(new Map<String, String>()));
@@ -866,39 +897,47 @@ public class CollectionUtilsTest {
     static void getValueFromSObject_should_get_field_value() {
         // given
         Contact c = new Contact(
-            LastName = 'Test'
-            , Account = new Account(
-                Name = 'AcctName'
-                , Parent = new Account(
-                    Name = 'ParentAcctName'
-                )
-            )
+            LastName = 'Test',
+            Account = new Account(Name = 'AcctName', Parent = new Account(Name = 'ParentAcctName'))
         );
 
         System.assertEquals('Test', CollectionUtils.getValueFromSObject(c, 'LastName'));
         System.assertEquals('AcctName', CollectionUtils.getValueFromSObject(c, 'Account.Name'));
-        System.assertEquals('ParentAcctName', CollectionUtils.getValueFromSObject(c, 'Account.Parent.Name'));
-        System.assertEquals(null, CollectionUtils.getValueFromSObject(c, 'Account.Parent.Parent.Name'));
-        System.assertEquals(null, CollectionUtils.getValueFromSObject(c, 'Account.Parent.Parent.Parent.Name'));
+        System.assertEquals(
+            'ParentAcctName',
+            CollectionUtils.getValueFromSObject(c, 'Account.Parent.Name')
+        );
+        System.assertEquals(
+            null,
+            CollectionUtils.getValueFromSObject(c, 'Account.Parent.Parent.Name')
+        );
+        System.assertEquals(
+            null,
+            CollectionUtils.getValueFromSObject(c, 'Account.Parent.Parent.Parent.Name')
+        );
     }
 
     @IsTest
     static void getValueFromSObject_should_get_sobject_value() {
         // given
         Contact c = new Contact(
-            LastName = 'Test'
-            , Account = new Account(
-                Name = 'AcctName'
-                , Parent = new Account(
-                    Name = 'ParentAcctName'
-                )
-            )
+            LastName = 'Test',
+            Account = new Account(Name = 'AcctName', Parent = new Account(Name = 'ParentAcctName'))
         );
 
         System.assertEquals(c.Account, CollectionUtils.getValueFromSObject(c, 'Account', true));
-        System.assertEquals(c.Account.Parent, CollectionUtils.getValueFromSObject(c, 'Account.Parent', true));
-        System.assertEquals(null, CollectionUtils.getValueFromSObject(c, 'Account.Parent.Parent', true));
-        System.assertEquals(null, CollectionUtils.getValueFromSObject(c, 'Account.Parent.Parent.Parent', true));
+        System.assertEquals(
+            c.Account.Parent,
+            CollectionUtils.getValueFromSObject(c, 'Account.Parent', true)
+        );
+        System.assertEquals(
+            null,
+            CollectionUtils.getValueFromSObject(c, 'Account.Parent.Parent', true)
+        );
+        System.assertEquals(
+            null,
+            CollectionUtils.getValueFromSObject(c, 'Account.Parent.Parent.Parent', true)
+        );
     }
 
     @IsTest
@@ -1076,7 +1115,11 @@ public class CollectionUtilsTest {
         System.assertEquals(true, CollectionUtils.evalOperator(null, operator, null));
     }
 
-    private static void assertSupportsOperator(CollectionUtils.FilterOperator operator, Object one, Object zero) {
+    private static void assertSupportsOperator(
+        CollectionUtils.FilterOperator operator,
+        Object one,
+        Object zero
+    ) {
         System.assertEquals(true, CollectionUtils.supportsOperator(operator, one, zero));
         System.assertEquals(true, CollectionUtils.supportsOperator(operator, one, null));
         System.assertEquals(true, CollectionUtils.supportsOperator(operator, null, zero));
@@ -1088,85 +1131,85 @@ public class CollectionUtilsTest {
         // type detection - type detected by first non-null item in list
 
         // integer
-        Object[] objList = new Object[] {null, 1, 1l, 1.0};
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Integer[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Long[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Decimal[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Double[]);
+        List<Object> objList = new List<Object>{ null, 1, 1L, 1.0 };
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Integer>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Long>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Decimal>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Double>);
 
         // long
-        objList = new Object[] {null, 1l, 1, 1.0};
-        System.assertEquals(false, CollectionUtils.convertObjectList(objList) instanceof Integer[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Long[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Decimal[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Double[]);
+        objList = new List<Object>{ null, 1L, 1, 1.0 };
+        System.assertEquals(false, CollectionUtils.convertObjectList(objList) instanceof List<Integer>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Long>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Decimal>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Double>);
 
         // decimal / double
-        objList = new Object[] {null, 1.0, 1, 1l};
-        System.assertEquals(false, CollectionUtils.convertObjectList(objList) instanceof Integer[]);
-        System.assertEquals(false, CollectionUtils.convertObjectList(objList) instanceof Long[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Decimal[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Double[]);
+        objList = new List<Object>{ null, 1.0, 1, 1L };
+        System.assertEquals(false, CollectionUtils.convertObjectList(objList) instanceof List<Integer>);
+        System.assertEquals(false, CollectionUtils.convertObjectList(objList) instanceof List<Long>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Decimal>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Double>);
 
         // String
-        objList = new Object[] {null, 'test'};
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof String[]);
+        objList = new List<Object>{ null, 'test' };
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<String>);
 
         // Id
-        objList = new Object[] {null, IdUtils.newId(Account.SObjectType)};
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Id[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof String[]);
+        objList = new List<Object>{ null, IdUtils.newId(Account.SObjectType) };
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Id>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<String>);
 
         // Boolean
-        objList = new Object[] {null, true, false};
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Boolean[]);
+        objList = new List<Object>{ null, true, false };
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Boolean>);
 
         // Blob
-        objList = new Object[] {null, Blob.valueOf('test')};
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Blob[]);
+        objList = new List<Object>{ null, Blob.valueOf('test') };
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Blob>);
 
         // Date
-        objList = new Object[] {null, Date.today(), DateTime.now()};
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Date[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof DateTime[]);
+        objList = new List<Object>{ null, Date.today(), DateTime.now() };
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Date>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Datetime>);
 
         // DateTime
-        objList = new Object[] {null, DateTime.now(), Date.today()};
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof DateTime[]);
+        objList = new List<Object>{ null, DateTime.now(), Date.today() };
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Datetime>);
 
         // Time
-        objList = new Object[] {null, Time.newInstance(0, 0, 0, 0)};
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Time[]);
+        objList = new List<Object>{ null, Time.newInstance(0, 0, 0, 0) };
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Time>);
 
         // SObject
-        objList = new Object[] {null, new Account()};
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof SObject[]);
-        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof Account[]);
+        objList = new List<Object>{ null, new Account() };
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<SObject>);
+        System.assertEquals(true, CollectionUtils.convertObjectList(objList) instanceof List<Account>);
 
         // unable to convert these types - assert list is same reference
         // null
-        objList = new Object[] {null, null, null};
+        objList = new List<Object>{ null, null, null };
         System.assertEquals(true, CollectionUtils.convertObjectList(objList) == objList);
         // list
-        objList = new Object[] {null, new List<String>()};
+        objList = new List<Object>{ null, new List<String>() };
         System.assertEquals(true, CollectionUtils.convertObjectList(objList) == objList);
         // set
-        objList = new Object[] {null, new Set<String>()};
+        objList = new List<Object>{ null, new Set<String>() };
         System.assertEquals(true, CollectionUtils.convertObjectList(objList) == objList);
         // map
-        objList = new Object[] {null, new Map<String, String>()};
+        objList = new List<Object>{ null, new Map<String, String>() };
         System.assertEquals(true, CollectionUtils.convertObjectList(objList) == objList);
     }
 
     class TestComparable implements Comparable {
-        public Integer value {get; set;}
+        public Integer value { get; set; }
 
         public TestComparable(Integer value) {
             this.value = value;
         }
 
         public Integer compareTo(Object compareTo) {
-            TestComparable compareToObj = (TestComparable)compareTo;
+            TestComparable compareToObj = (TestComparable) compareTo;
             if (this.value == compareToObj.value) {
                 return 0;
             } else if (this.value > compareToObj.value) {

@@ -1,11 +1,11 @@
 public class SListApi implements Iterable<SObject> {
-    SObject[] sobList;
+    List<SObject> sobList;
 
-    public static SListApi fromList(SObject[] sobList) {
+    public static SListApi fromList(List<SObject> sobList) {
         return new SListApi(sobList);
     }
 
-    public SListApi(SObject[] sobList) {
+    public SListApi(List<SObject> sobList) {
         this.sobList = new List<SObject>(sobList);
     }
 
@@ -32,35 +32,35 @@ public class SListApi implements Iterable<SObject> {
         return this;
     }
 
-    public Map<Id, SObject[]> groupById(String groupByField) {
-        Map<Object, SObject[]> groupedCollection = CollectionUtils.groupBy(sobList, groupByField);
-        Map<Id, SObject[]> idGroup = new Map<Id, SObject[]>();
+    public Map<Id, List<SObject>> groupById(String groupByField) {
+        Map<Object, List<SObject>> groupedCollection = CollectionUtils.groupBy(sobList, groupByField);
+        Map<Id, List<SObject>> idGroup = new Map<Id, List<SObject>>();
         for (Object key : groupedCollection.keySet()) {
             idGroup.put((Id) key, groupedCollection.get(key));
         }
         return idGroup;
     }
-    public Map<String, SObject[]> groupByString(String groupByField) {
-        Map<Object, SObject[]> groupedCollection = CollectionUtils.groupBy(sobList, groupByField);
-        Map<String, SObject[]> stringGroup = new Map<String, SObject[]>();
+    public Map<String, List<SObject>> groupByString(String groupByField) {
+        Map<Object, List<SObject>> groupedCollection = CollectionUtils.groupBy(sobList, groupByField);
+        Map<String, List<SObject>> stringGroup = new Map<String, List<SObject>>();
         for (Object key : groupedCollection.keySet()) {
             stringGroup.put((String) key, groupedCollection.get(key));
         }
         return stringGroup;
     }
-    public Map<Object, SObject[]> groupBy(String groupByField) {
+    public Map<Object, List<SObject>> groupBy(String groupByField) {
         return CollectionUtils.groupBy(sobList, groupByField);
     }
-    public Map<Object, SObject[]> groupBy(String groupByField, Boolean isSObject) {
+    public Map<Object, List<SObject>> groupBy(String groupByField, Boolean isSObject) {
         return CollectionUtils.groupBy(sobList, groupByField, isSObject);
     }
 
     public ListApi pluck(String fieldToPluck) {
-        Object[] result = CollectionUtils.pluck(sobList, fieldToPluck, false, new List<Object>{});
+        List<Object> result = CollectionUtils.pluck(sobList, fieldToPluck, false, new List<Object>{});
         return new ListApi(result);
     }
     public SListApi pluck(String fieldToPluck, Boolean isSObject) {
-        this.sobList = (SObject[]) CollectionUtils.pluck(sobList, fieldToPluck, isSObject);
+        this.sobList = (List<SObject>) CollectionUtils.pluck(sobList, fieldToPluck, isSObject);
         return this;
     }
 
@@ -77,8 +77,8 @@ public class SListApi implements Iterable<SObject> {
         return this;
     }
 
-    public SListApi difference(SObject[] sobListB) {
-        this.sobList = (SObject[]) CollectionUtils.difference(
+    public SListApi difference(List<SObject> sobListB) {
+        this.sobList = (List<SObject>) CollectionUtils.difference(
             sobList,
             sobListB,
             new List<SObject>{}
@@ -86,8 +86,8 @@ public class SListApi implements Iterable<SObject> {
         return this;
     }
 
-    public SListApi intersect(SObject[] sobListB) {
-        this.sobList = (SObject[]) CollectionUtils.intersect(
+    public SListApi intersect(List<SObject> sobListB) {
+        this.sobList = (List<SObject>) CollectionUtils.intersect(
             sobList,
             sobListB,
             new List<SObject>{}
@@ -95,12 +95,12 @@ public class SListApi implements Iterable<SObject> {
         return this;
     }
 
-    public SListApi union(SObject[] sobListB) {
-        this.sobList = (SObject[]) CollectionUtils.union(sobList, sobListB, new List<SObject>{});
+    public SListApi union(List<SObject> sobListB) {
+        this.sobList = (List<SObject>) CollectionUtils.union(sobList, sobListB, new List<SObject>{});
         return this;
     }
 
-    public SObject[] toList() {
+    public List<SObject> toList() {
         return sobList;
     }
 
@@ -113,7 +113,7 @@ public class SListApi implements Iterable<SObject> {
         sobList.add(idx, sob);
     }
 
-    public void addAll(SObject[] sobs) {
+    public void addAll(List<SObject> sobs) {
         sobList.addAll(sobs);
     }
 
@@ -125,20 +125,20 @@ public class SListApi implements Iterable<SObject> {
         return sobList.contains(sob);
     }
 
-    public Boolean containsAll(SObject[] sobs) {
+    public Boolean containsAll(List<SObject> sobs) {
         return new Set<SObject>(sobList).containsAll(sobs);
     }
 
-    public SObject[] deepClone() {
+    public List<SObject> deepClone() {
         return sobList.deepClone();
     }
-    public SObject[] deepClone(Boolean preserveId) {
+    public List<SObject> deepClone(Boolean preserveId) {
         return sobList.deepClone(preserveId);
     }
-    public SObject[] deepClone(Boolean preserveId, Boolean preserveReadonlyTimestamps) {
+    public List<SObject> deepClone(Boolean preserveId, Boolean preserveReadonlyTimestamps) {
         return sobList.deepClone(preserveId, preserveReadonlyTimestamps);
     }
-    public SObject[] deepClone(
+    public List<SObject> deepClone(
         Boolean preserveId,
         Boolean preserveReadonlyTimestamps,
         Boolean preserveAutonumber
@@ -146,7 +146,7 @@ public class SListApi implements Iterable<SObject> {
         return sobList.deepClone(preserveId, preserveReadonlyTimestamps, preserveAutonumber);
     }
 
-    public Boolean equals(SObject[] sobs) {
+    public Boolean equals(List<SObject> sobs) {
         return sobList.equals(sobs);
     }
 

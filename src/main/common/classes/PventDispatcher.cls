@@ -4,7 +4,7 @@ public class PventDispatcher {
     private static List<SObject> publishedEvents = new List<SObject>();
 
     public static void publishEvent(SObject event) {
-        publishEvents(new SObject[] {event});
+        publishEvents(new List<SObject> {event});
     }
 
     public static void publishEvents(List<SObject> events) {

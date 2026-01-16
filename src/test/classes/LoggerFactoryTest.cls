@@ -39,7 +39,7 @@ public class LoggerFactoryTest {
 
         // when
         // LoggerFactory.allowTestInstance = true;
-        LoggerFactory.initializeLoggerBlueprints(new LoggerConfig__mdt[]{config});
+        LoggerFactory.initializeLoggerBlueprints(new List<LoggerConfig__mdt> {config});
 
         // then
         System.assert(LoggerFactory.loggerBlueprints.containsKey('DEFAULT'), LoggerFactory.loggerBlueprints.keyset());
@@ -60,7 +60,7 @@ public class LoggerFactoryTest {
 
     @IsTest
     static void it_should_fail_if_current_loggers_are_misconfigured() {
-        LoggerConfig__mdt[] configs = [SELECT MasterLabel, Log_Threshold__c, Logger_Class__c, Flush_Threshold__c FROM LoggerConfig__mdt];
+        List<LoggerConfig__mdt> configs = [SELECT MasterLabel, Log_Threshold__c, Logger_Class__c, Flush_Threshold__c FROM LoggerConfig__mdt];
 
         for (LoggerConfig__mdt config : configs) {
             LoggerFactory.LoggerBlueprint blueprint = new LoggerFactory.LoggerBlueprint(config);
@@ -75,7 +75,7 @@ public class LoggerFactoryTest {
     }
 
     public class TestLogger extends Loggers.LoggerBase {
-        public override void writeLogItems(LogItem[] items) {
+        public override void writeLogItems(List<LogItem> items) {
             System.debug('Logs flushed');
         }
     }

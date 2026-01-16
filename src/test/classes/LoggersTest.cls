@@ -9,6 +9,7 @@ public class LoggersTest {
 
     @IsTest
     static void LogItem_should_print_line_with_stacktrace() {
+        // throw and catch a null pointer exception
         Exception caught;
         try {
             caught.getMessage();
@@ -16,9 +17,9 @@ public class LoggersTest {
             caught = ex;
         }
         Loggers.LogItem item = new Loggers.LogItem(LoggingLevel.DEBUG, caught, 'LoggersTest');
-        String[] results = item.printLog().split('\n');
-        System.assert(results[0].endsWith(' - LoggersTest |DEBUG| System.NullPointerException: Attempt to de-reference a null object'), results);
-        System.assert(results[1].startsWith('Cause: Class.LoggersTest.LogItem_should_print_line_with_stacktrace: line '), results);
+        List<String> results = item.printLog().split('\n');
+        System.assert(results[0].endsWith(' - LoggersTest |DEBUG| System.NullPointerException: Attempt to de-reference a null object'), results[0]);
+        System.assert(results[1].startsWith('Cause: Class.LoggersTest.LogItem_should_print_line_with_stacktrace: line '), results[1]);
     }
 
     @IsTest
@@ -127,7 +128,7 @@ public class LoggersTest {
         System.assertNotEquals(null, log.aggregateItem);
         System.assertEquals('Test', log.aggregateItem.category);
         System.assertEquals(LoggingLevel.INFO, log.aggregateItem.logLevel);
-        String[] messages = log.aggregateItem.message.split('\n');
+        List<String> messages = log.aggregateItem.message.split('\n');
         System.assertEquals(2, messages.size());
         System.assert(messages[0].endsWith(' - Test |INFO| Test Info'));
         System.assert(messages[1].endsWith(' - Test |DEBUG| Test Debug'));
@@ -143,7 +144,7 @@ public class LoggersTest {
         System.assertNotEquals(null, log.aggregateItem);
         System.assertEquals('Test', log.aggregateItem.category);
         System.assertEquals(LoggingLevel.DEBUG, log.aggregateItem.logLevel);
-        String[] messages = log.aggregateItem.message.split('\n');
+        List<String> messages = log.aggregateItem.message.split('\n');
         System.assertEquals(1, messages.size());
         System.assert(messages[0].endsWith(' - Test |DEBUG| Test Debug'));
     }
@@ -157,7 +158,7 @@ public class LoggersTest {
         log.info('Test Info');
         log.flush();
 
-        Log__c[] logEntries = [SELECT Category__c, Log_Level__c, Message__c, Log_Time__c, Log_User__c FROM Log__c ORDER BY Log_Time__c];
+        List<Log__c> logEntries = [SELECT Category__c, Log_Level__c, Message__c, Log_Time__c, Log_User__c FROM Log__c ORDER BY Log_Time__c];
         System.assertEquals(2, logEntries.size());
         Log__c entry = logEntries[0];
         System.assertEquals('Test', entry.Category__c);
@@ -181,13 +182,13 @@ public class LoggersTest {
         log.info('Test Info');
         log.flush();
 
-        Log__c[] logEntries = [SELECT Category__c, Log_Level__c, Message__c, Log_Time__c, Log_User__c FROM Log__c ORDER BY Log_Time__c];
+        List<Log__c> logEntries = [SELECT Category__c, Log_Level__c, Message__c, Log_Time__c, Log_User__c FROM Log__c ORDER BY Log_Time__c];
         System.assertEquals(1, logEntries.size());
         Log__c entry = logEntries[0];
         System.assertEquals('Test', entry.Category__c);
         System.assertEquals('INFO', entry.Log_Level__c);
         System.assertEquals(UserInfo.getUserId(), entry.Log_User__c);
-        String[] messages = entry.Message__c.split('\n');
+        List<String> messages = entry.Message__c.split('\n');
         System.assert(messages[0].endsWith(' - Test |DEBUG| Test Debug'));
         System.assert(messages[1].endsWith(' - Test |INFO| Test Info'));
     }
@@ -226,22 +227,22 @@ public class LoggersTest {
         LogEvent__e entry = (LogEvent__e)PventDispatcher.publishedEvents[0];
         System.assertEquals('Test', entry.Category__c);
         System.assertEquals('INFO', entry.Log_Level__c);
-        String[] messages = entry.Message__c.split('\n');
+        List<String> messages = entry.Message__c.split('\n');
         System.assert(messages[0].endsWith(' - Test |DEBUG| Test Debug'));
         System.assert(messages[1].endsWith(' - Test |INFO| Test Info'));
     }
 
     public class TestLogger extends Loggers.LoggerBase {
-        public Loggers.LogItem[] flushedItems {get; set;}
+        public List<Loggers.LogItem> flushedItems {get; set;}
         public TestLogger() {
             super();
-            flushedItems = new Loggers.LogItem[] {};
+            flushedItems = new List<Loggers.LogItem> {};
         }
         public TestLogger(String category) {
             this();
             setCategory(category);
         }
-        protected override void writeLogItems(LogItem[] items) {
+        protected override void writeLogItems(List<LogItem> items) {
             flushedItems.addAll(items);
         }
     }
@@ -260,12 +261,12 @@ public class LoggersTest {
         }
     }
 
-    public static Log__c[] findErrorLogs() {
+    public static List<Log__c> findErrorLogs() {
         return [SELECT Message__c FROM Log__c WHERE Log_Level__c = 'ERROR'];
     }
 
     public static void assertNoErrorLogs() {
-        Log__c[] errorLogs = findErrorLogs();
+        List<Log__c> errorLogs = findErrorLogs();
         System.assertEquals(0, errorLogs.size(), errorLogs);
     }
 }

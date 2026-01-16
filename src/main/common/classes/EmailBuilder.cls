@@ -82,7 +82,7 @@ public virtual class EmailBuilder {
     }
 
     public virtual void sendEmail() {
-        Messaging.sendEmail(new Messaging.SingleEmailMessage[] {email});
+        Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{email});
     }
 
     public virtual void sendEmailNoError() {
